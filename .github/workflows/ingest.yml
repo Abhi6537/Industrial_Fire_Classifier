@@ -1,0 +1,35 @@
+name: Scheduled Satellite Fire Ingestion Pipeline
+
+on:
+  schedule:
+    # Run every 6 hours (UTC) to match VIIRS satellite orbital overpass passes
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allows manual triggering from GitHub Actions UI
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Execute Ingestion Pipeline
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          FIRMS_MAP_KEY: ${{ secrets.FIRMS_MAP_KEY }}
+          TARGET_REGION: ${{ vars.TARGET_REGION || 'gujarat' }}
+          TARGET_BBOX: ${{ vars.TARGET_BBOX || '68.0,20.0,78.0,26.0' }}
+        run: |
+          python scripts/run_ingestion.py
