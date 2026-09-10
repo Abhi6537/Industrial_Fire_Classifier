@@ -214,10 +214,6 @@ export function ThermalMap({
         attributionControl: true,
       });
 
-      const cartoKey =
-        process.env.NEXT_PUBLIC_CARTO_API_KEY ||
-        "a_live_e388efd464db3b723ea67fce51a88b57731ce3ba";
-
       // 1. Tactical Dark Canvas (Esri World Dark Gray Base)
       const tacticalDark = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
@@ -238,9 +234,15 @@ export function ThermalMap({
         }
       );
 
+      const cartoKey =
+        process.env.NEXT_PUBLIC_CARTO_KEY ||
+        process.env.NEXT_PUBLIC_CARTO_API_KEY ||
+        "";
+      const cartoQuery = cartoKey ? `?key=${cartoKey}` : "";
+
       // 3. CARTO Dark Matter (High-contrast dark mode)
       const cartoDark = L.tileLayer(
-        `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${cartoQuery}`,
         {
           attribution:
             '&copy; <a href="https://carto.com/">CARTO</a> | &copy; OpenStreetMap | NASA FIRMS',
@@ -251,7 +253,7 @@ export function ThermalMap({
 
       // 4. CARTO Voyager (Street & Infrastructure Topo)
       const cartoVoyager = L.tileLayer(
-        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png${cartoQuery}`,
         {
           attribution:
             '&copy; <a href="https://carto.com/">CARTO</a> | &copy; OpenStreetMap',
