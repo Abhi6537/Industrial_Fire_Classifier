@@ -10,28 +10,29 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // ThermoWatch base surfaces matching reference image
-        "tw-navy":    "#0b101d",
-        "tw-surface": "#111827",
-        "tw-raised":  "#1f293d",
-        "tw-border":  "#1e293b",
-        "tw-border-hi": "#334155",
-        // Accent (Flame Coral / Red CTA)
-        "tw-orange":   "#f95738",
-        "tw-orange-hi":"#ff6b4a",
-        "tw-teal":     "#0d9488",
-        "tw-teal-hi":  "#14b8a6",
-        // Text
-        "tw-text":    "#f8fafc",
-        "tw-muted":   "#64748b",
-        "tw-dim":     "#475569",
+        // Direction 3: Tactical Field Operations / Defense GIS
+        "tw-navy":    "#141714",
+        "tw-surface": "#1c1f1b",
+        "tw-raised":  "#262a24",
+        "tw-border":  "#2f352e",
+        "tw-border-hi": "#454e43",
+        // Primary Tactical Accent (Burnt Rust Amber)
+        "tw-orange":   "#c05621",
+        "tw-orange-hi":"#dd6b20",
+        // Secondary GIS Accent (Muted Tactical Olive)
+        "tw-teal":     "#78866b",
+        "tw-teal-hi":  "#94a388",
+        // Text Typography (Warm Pale Sand & Field Grays)
+        "tw-text":    "#e8e4d9",
+        "tw-muted":   "#98a092",
+        "tw-dim":     "#60675b",
         // Thermal classification
-        "th-fire":    "#ef4444",
-        "th-flare":   "#f97316",
-        "th-persist": "#eab308",
-        "th-agri":    "#84cc16",
-        "th-nature":  "#22c55e",
-        "th-unknown": "#64748b",
+        "th-fire":    "#dc2626",
+        "th-flare":   "#d97706",
+        "th-persist": "#ca8a04",
+        "th-agri":    "#65a30d",
+        "th-nature":  "#16a34a",
+        "th-unknown": "#71717a",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],

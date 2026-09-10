@@ -64,7 +64,7 @@ export default function AlertsPage() {
         {/* Top Bar Header */}
         <Header />
 
-        <main className="p-6 space-y-6 overflow-y-auto">
+        <main className="p-6 pb-24 space-y-6 overflow-y-auto">
           {/* Header Title + Export */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
@@ -76,7 +76,7 @@ export default function AlertsPage() {
               </p>
             </div>
 
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-tw-surface border border-tw-border hover:border-tw-border-hi text-tw-muted hover:text-tw-text rounded-lg text-xs font-semibold transition-colors self-start sm:self-auto">
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-[#181b17]/90 border border-white/15 hover:bg-[#222620] text-tw-muted hover:text-tw-text rounded-full text-xs font-semibold transition-colors self-start sm:self-auto">
               <Download className="w-3.5 h-3.5" />
               Export
             </button>
@@ -85,34 +85,30 @@ export default function AlertsPage() {
           {/* ── Summary Cards Row (5 mini cards) ────────────────────────── */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {[
-              { id: "all", label: "All", count: 128, color: "#3b82f6" },
-              { id: "industrial", label: "Industrial", count: 27, color: "#ef4444" },
-              { id: "gas_flare", label: "Gas Flare", count: 18, color: "#f59e0b" },
-              { id: "persistent", label: "Persistent", count: 41, color: "#eab308" },
-              { id: "others", label: "Others", count: 42, color: "#9ca3af" },
+              { id: "all", label: "All", count: 128, color: "#64b5f6" },
+              { id: "industrial", label: "Industrial", count: 27, color: "#e57373" },
+              { id: "gas_flare", label: "Gas Flare", count: 18, color: "#64b5f6" },
+              { id: "persistent", label: "Persistent", count: 41, color: "#b39ddb" },
+              { id: "others", label: "Others", count: 42, color: "#90a4ae" },
             ].map((card) => {
               const isSelected = selectedCategory === card.id;
               return (
                 <button
                   key={card.id}
                   onClick={() => setSelectedCategory(card.id)}
-                  className={`p-3.5 rounded-xl border text-left transition-all ${
+                  className={`p-4 rounded-2xl border text-left transition-all ${
                     isSelected
-                      ? "bg-tw-raised border-tw-teal shadow-md"
-                      : "bg-tw-surface border-tw-border hover:border-tw-border-hi"
+                      ? "bg-[#1f231d] border-tw-teal/60 shadow-lg"
+                      : "bg-[#181b17]/90 border-white/10 hover:border-white/20"
                   }`}
                 >
-                  <p className="text-[11px] font-semibold text-tw-muted mb-1">
+                  <p className="text-[11px] font-medium text-tw-muted mb-1 tracking-wide">
                     {card.label}
                   </p>
                   <div className="flex items-baseline justify-between">
-                    <span className="text-xl font-bold text-tw-text">
+                    <span className="text-2xl font-bold font-mono text-tw-text">
                       {card.count}
                     </span>
-                    <span
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{ backgroundColor: card.color }}
-                    />
                   </div>
                 </button>
               );
@@ -120,16 +116,16 @@ export default function AlertsPage() {
           </div>
 
           {/* ── Filter Bar ──────────────────────────────────────────────── */}
-          <div className="bg-tw-surface border border-tw-border rounded-xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
+          <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-4 flex flex-col md:flex-row gap-4 items-center justify-between">
             {/* Search Input */}
             <div className="relative w-full md:w-80">
-              <Search className="w-4 h-4 text-tw-muted absolute left-3 top-1/2 -translate-y-1/2" />
+              <Search className="w-4 h-4 text-tw-muted absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
                 placeholder="Search location, type or date..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-tw-navy border border-tw-border rounded-lg pl-9 pr-4 py-1.5 text-xs text-tw-text placeholder-tw-muted focus:outline-none focus:border-tw-teal"
+                className="w-full bg-[#141714] border border-white/15 rounded-full pl-9 pr-4 py-1.5 text-xs text-tw-text placeholder-tw-muted focus:outline-none focus:border-tw-teal"
               />
             </div>
 
@@ -137,8 +133,8 @@ export default function AlertsPage() {
             <div className="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
               {/* Date Range */}
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="text-tw-muted">Date Range:</span>
-                <select className="bg-tw-navy border border-tw-border text-tw-text rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-tw-teal">
+                <span className="text-tw-muted font-medium">Date Range:</span>
+                <select className="bg-[#141714] border border-white/15 text-tw-text rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-tw-teal">
                   <option value="oct">Oct 1, 2024 - Oct 7, 2024</option>
                   <option value="sep">Sep 2024</option>
                   <option value="all">All Time</option>
@@ -147,11 +143,11 @@ export default function AlertsPage() {
 
               {/* Severity Filter */}
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="text-tw-muted">Severity:</span>
+                <span className="text-tw-muted font-medium">Severity:</span>
                 <select
                   value={selectedSeverity}
                   onChange={(e) => setSelectedSeverity(e.target.value)}
-                  className="bg-tw-navy border border-tw-border text-tw-text rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-tw-teal"
+                  className="bg-[#141714] border border-white/15 text-tw-text rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-tw-teal"
                 >
                   <option value="all">All</option>
                   <option value="high">High</option>
@@ -162,11 +158,11 @@ export default function AlertsPage() {
 
               {/* Status Filter */}
               <div className="flex items-center gap-1.5 text-xs">
-                <span className="text-tw-muted">Status:</span>
+                <span className="text-tw-muted font-medium">Status:</span>
                 <select
                   value={selectedStatus}
                   onChange={(e) => setSelectedStatus(e.target.value)}
-                  className="bg-tw-navy border border-tw-border text-tw-text rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-tw-teal"
+                  className="bg-[#141714] border border-white/15 text-tw-text rounded-full px-3 py-1.5 text-xs focus:outline-none focus:border-tw-teal"
                 >
                   <option value="all">All</option>
                   <option value="open">Open</option>
@@ -179,11 +175,11 @@ export default function AlertsPage() {
           </div>
 
           {/* ── Incident Table ─────────────────────────────────────────── */}
-          <div className="bg-tw-surface border border-tw-border rounded-xl overflow-hidden shadow-lg">
+          <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl overflow-hidden shadow-lg">
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
-                  <tr className="bg-tw-navy/50 text-tw-muted border-b border-tw-border font-medium">
+                  <tr className="bg-[#141714]/80 text-tw-muted border-b border-white/10 font-semibold tracking-wide uppercase text-[10px]">
                     <th className="p-4">Date & Time (IST)</th>
                     <th className="p-4">Location</th>
                     <th className="p-4">Type</th>
@@ -192,11 +188,11 @@ export default function AlertsPage() {
                     <th className="p-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-tw-border">
+                <tbody className="divide-y divide-white/5">
                   {filteredIncidents.map((incident) => (
                     <tr
                       key={incident.id}
-                      className="hover:bg-tw-raised/40 transition-colors"
+                      className="hover:bg-white/[0.03] transition-colors"
                     >
                       <td className="p-4 font-mono text-tw-muted">
                         {formatTimestamp(incident.timestamp)}
@@ -216,7 +212,7 @@ export default function AlertsPage() {
                       <td className="p-4 text-right">
                         <Link
                           href={`/site/${incident.facilityId || "fac_001"}`}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-tw-teal/10 hover:bg-tw-teal/20 border border-tw-teal/30 text-tw-teal rounded text-xs font-semibold transition-colors"
+                          className="inline-flex items-center gap-1 px-3.5 py-1 bg-white/5 hover:bg-white/10 border border-white/15 text-tw-text rounded-full text-xs font-medium transition-colors"
                         >
                           View
                         </Link>

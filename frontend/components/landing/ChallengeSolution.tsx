@@ -95,7 +95,7 @@ export function ChallengeSolution() {
             </h2>
 
             <p className="text-tw-muted text-sm leading-relaxed">
-              ThermoWatch combines thermal anomaly detections with industrial
+              The platform combines thermal anomaly detections with industrial
               infrastructure, land-cover context, satellite imagery and historical
               thermal behavior to classify and contextualize thermal activity in
               real time.

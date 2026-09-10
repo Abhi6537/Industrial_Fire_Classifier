@@ -30,8 +30,8 @@
   }
 
   body {
-    background-color: #0b101d;
-    color: #f8fafc;
+    background-color: #141714;
+    color: #e8e4d9;
     font-family: var(--font-inter), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
   }
@@ -39,14 +39,14 @@
 
 /* ─── Leaflet dark overrides ────────────────────────────────────────────── */
 .leaflet-container {
-  background: #0a0e1a !important;
+  background: #141714 !important;
   font-family: var(--font-inter), system-ui, sans-serif !important;
 }
 
 .leaflet-popup-content-wrapper {
-  background: #0f1629 !important;
-  border: 1px solid #1e2d45 !important;
-  color: #e2e8f0 !important;
+  background: #1c1f1b !important;
+  border: 1px solid #2f352e !important;
+  color: #e8e4d9 !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7) !important;
   border-radius: 10px !important;
   padding: 0 !important;
@@ -60,51 +60,62 @@
 .leaflet-popup-tip-container { display: none !important; }
 
 .leaflet-popup-close-button {
-  color: #64748b !important;
+  color: #98a092 !important;
   top: 10px !important;
   right: 10px !important;
 }
 
-.leaflet-popup-close-button:hover { color: #e2e8f0 !important; }
+.leaflet-popup-close-button:hover { color: #e8e4d9 !important; }
 
 .leaflet-tooltip {
-  background: #0f1629 !important;
-  border: 1px solid #1e2d45 !important;
-  color: #e2e8f0 !important;
+  background: #1c1f1b !important;
+  border: 1px solid #2f352e !important;
+  color: #e8e4d9 !important;
   font-size: 11px !important;
   border-radius: 6px !important;
   padding: 5px 10px !important;
   box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
 }
 
-.leaflet-tooltip-top::before { border-top-color: #1e2d45 !important; }
+.leaflet-tooltip-top::before { border-top-color: #2f352e !important; }
 
 .leaflet-bar a,
 .leaflet-bar a:hover {
-  background: #0f1629 !important;
-  border-bottom: 1px solid #1e2d45 !important;
-  color: #64748b !important;
+  background: #1c1f1b !important;
+  border-bottom: 1px solid #2f352e !important;
+  color: #98a092 !important;
 }
 
-.leaflet-bar a:hover { color: #e2e8f0 !important; }
+.leaflet-bar a:hover { color: #e8e4d9 !important; }
 
 .leaflet-control-layers {
-  background: #0f1629 !important;
-  border: 1px solid #1e2d45 !important;
-  color: #e2e8f0 !important;
+  background: #1c1f1b !important;
+  border: 1px solid #2f352e !important;
+  color: #e8e4d9 !important;
   border-radius: 8px !important;
 }
 
-.leaflet-control-layers label { color: #94a3b8 !important; }
+.leaflet-control-layers label { color: #98a092 !important; }
+
+.leaflet-control-attribution {
+  background: rgba(28, 31, 27, 0.7) !important;
+  color: #98a092 !important;
+  font-size: 10px !important;
+  z-index: 400 !important;
+}
+
+.leaflet-control-attribution a {
+  color: #e8e4d9 !important;
+}
 
 /* ─── Custom scrollbar ──────────────────────────────────────────────────── */
 ::-webkit-scrollbar            { width: 5px; }
-::-webkit-scrollbar-track      { background: #0a0e1a; }
-::-webkit-scrollbar-thumb      { background: #1e2d45; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover{ background: #2a3f5e; }
+::-webkit-scrollbar-track      { background: #141714; }
+::-webkit-scrollbar-thumb      { background: #2f352e; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover{ background: #454e43; }
 
 /* ─── Thermal marker dot ────────────────────────────────────────────────── */
 .thermal-dot { position: relative; display: flex; align-items: center; justify-content: center; }
 
 /* ─── Selection ─────────────────────────────────────────────────────────── */
-::selection { background: rgba(13, 148, 136, 0.25); color: #e2e8f0; }
+::selection { background: rgba(192, 86, 33, 0.25); color: #e8e4d9; }

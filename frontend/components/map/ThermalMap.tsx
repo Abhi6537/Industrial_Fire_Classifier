@@ -332,7 +332,7 @@ export function ThermalMap({
 
         marker.bindPopup(buildPopupHTML(detection), {
           maxWidth: 280,
-          className: "thermowatch-popup",
+          className: "thermal-popup",
         });
 
         marker.addTo(markersLayerRef.current);
@@ -342,39 +342,11 @@ export function ThermalMap({
 
   return (
     <div
-      className={`relative overflow-hidden rounded-xl border border-tw-border ${className}`}
+      className={`relative overflow-hidden w-full h-full ${className}`}
       style={{ height }}
     >
       {/* Map container */}
       <div ref={containerRef} className="w-full h-full" />
-
-      {/* Legend overlay */}
-      <div className="absolute bottom-4 left-4 z-[999] bg-tw-surface/90 backdrop-blur-sm border border-tw-border rounded-lg p-3 text-xs flex flex-col gap-2">
-        <p className="text-tw-muted font-semibold uppercase tracking-wider text-[10px]">
-          Classification Legend
-        </p>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
-          {Object.entries(CLASSIFICATION_META).map(([key, meta]) => (
-            <div key={key} className="flex items-center gap-2">
-              <span
-                className="w-2 h-2 rounded-full flex-shrink-0"
-                style={{ backgroundColor: meta.color }}
-              />
-              <span className="text-tw-muted text-[11px]">{meta.label}</span>
-            </div>
-          ))}
-          <div className="flex items-center gap-2 col-span-2 pt-1 border-t border-tw-border">
-            <span className="w-3 h-2 border border-sky-400 border-dashed bg-sky-500/20 rounded-[1px] flex-shrink-0" />
-            <span className="text-tw-muted text-[10px] font-mono">OSM Industrial Boundary</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Detection count pill */}
-      <div className="absolute top-4 left-4 z-[999] bg-tw-surface/95 backdrop-blur-md border border-tw-border rounded-lg px-3 py-1.5 text-xs text-tw-text font-mono font-semibold flex items-center gap-2 shadow-md">
-        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-        <span>{detections.length} Satellite Detections</span>
-      </div>
     </div>
   );
 }

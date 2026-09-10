@@ -10,16 +10,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "ThermoWatch — Industrial Thermal Intelligence",
+  title: "Industrial Thermal Intelligence",
   description:
-    "AI-powered detection and classification of industrial fires and persistent thermal sources using NASA FIRMS, OpenStreetMap and satellite data. SIH Problem Statement 26162.",
+    "AI-powered detection and classification of industrial fires and persistent thermal sources using NASA FIRMS, OpenStreetMap and satellite data.",
   keywords: [
     "NASA FIRMS",
     "thermal anomaly",
     "industrial fire detection",
     "satellite monitoring",
     "geospatial intelligence",
-    "SIH 2024",
   ],
 };
 
