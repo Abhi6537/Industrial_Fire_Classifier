@@ -357,20 +357,20 @@ function SiteDetailContent() {
         {/* Top Bar Header */}
         <Header />
 
-        <main className="p-6 space-y-6 overflow-y-auto">
+        <main className="p-6 pb-24 space-y-6 overflow-y-auto">
           {/* Header & Back link */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-1.5 text-xs text-tw-muted hover:text-tw-text transition-colors font-medium"
+                className="inline-flex items-center gap-1.5 text-xs text-tw-muted hover:text-tw-text transition-colors font-medium px-3.5 py-1.5 bg-[#181b17]/90 border border-white/10 rounded-full"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Back to Dashboard
               </Link>
               <button
                 onClick={handleCopyJson}
-                className="inline-flex items-center gap-1.5 px-3 py-1 bg-tw-surface hover:bg-tw-raised border border-tw-border text-tw-text text-xs rounded-lg transition-colors font-mono"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-[#181b17]/90 hover:bg-[#222620] border border-white/15 text-tw-text text-xs rounded-full transition-colors font-mono"
               >
                 {copiedPayload ? (
                   <>
@@ -387,7 +387,7 @@ function SiteDetailContent() {
             </div>
 
             {/* Title & Navigation Tabs Card */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg">
               <div>
                 <div className="flex items-center gap-3 mb-1">
                   <h1 className="text-xl font-bold text-tw-text tracking-tight">
@@ -401,7 +401,7 @@ function SiteDetailContent() {
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-1 bg-tw-navy p-1 rounded-lg border border-tw-border">
+              <div className="flex items-center gap-1 bg-[#141714] p-1.5 rounded-full border border-white/15">
                 {(
                   [
                     ["Overview", "overview"],
@@ -414,9 +414,9 @@ function SiteDetailContent() {
                   <button
                     key={key}
                     onClick={() => setActiveTab(key)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                    className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
                       activeTab === key
-                        ? "bg-tw-teal text-white shadow"
+                        ? "bg-[#1f231d] text-white shadow border border-white/20"
                         : "text-tw-muted hover:text-tw-text"
                     }`}
                   >
@@ -430,7 +430,7 @@ function SiteDetailContent() {
           {/* ── Top 3 Columns: Map + Facility Info + Latest Detection ───────── */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Zoomed Map (1 col) */}
-            <div className="bg-tw-surface border border-tw-border rounded-xl overflow-hidden p-1 shadow-lg h-72">
+            <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl overflow-hidden p-1 shadow-lg h-72">
               <ThermalMap
                 detections={[
                   {
@@ -459,9 +459,9 @@ function SiteDetailContent() {
             </div>
 
             {/* Facility / Geographic Information Card (1 col) */}
-            <div className="bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg flex flex-col justify-between">
+            <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
               <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-tw-muted mb-4 pb-2 border-b border-tw-border">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-tw-muted mb-4 pb-2 border-b border-white/10">
                   Facility Information
                 </h3>
                 <div className="space-y-2.5 text-xs">
@@ -506,7 +506,7 @@ function SiteDetailContent() {
                 href={`https://www.openstreetmap.org/search?query=${profile.lat},${profile.lng}`}
                 target="_blank"
                 rel="noreferrer"
-                className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 bg-tw-navy hover:bg-tw-raised border border-tw-border text-tw-teal text-xs font-semibold rounded-lg transition-colors"
+                className="mt-4 flex items-center justify-center gap-1.5 w-full py-2 bg-[#141714] hover:bg-[#222620] border border-white/15 text-tw-teal text-xs font-semibold rounded-full transition-colors"
               >
                 View on OpenStreetMap
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -514,14 +514,19 @@ function SiteDetailContent() {
             </div>
 
             {/* Latest Detection Card (1 col) */}
-            <div className="bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg flex flex-col justify-between">
+            <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-2 border-b border-tw-border mb-4">
+                <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-4">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-tw-muted">
                     Latest Detection
                   </h3>
-                  <span className={`flex items-center gap-1 text-[10px] font-semibold ${profile.status === "open" ? "text-red-400" : "text-emerald-400"}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${profile.status === "open" ? "bg-red-500 animate-pulse" : "bg-emerald-500"}`} />
+                  <span
+                    className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                      profile.status === "open"
+                        ? "bg-red-500/12 text-[#e57373] border border-red-500/25"
+                        : "bg-emerald-500/12 text-[#81c784] border border-emerald-500/25"
+                    }`}
+                  >
                     {profile.status === "open" ? "ALERT" : "MONITORING"}
                   </span>
                 </div>
@@ -552,14 +557,14 @@ function SiteDetailContent() {
                   </div>
 
                   {profile.classification === "industrial_fire" ? (
-                    <div className="p-3 bg-red-500/10 border border-red-500/25 rounded-lg flex items-start gap-2.5">
-                      <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0 mt-0.5" />
-                      <p className="text-red-300 text-xs leading-relaxed">
+                    <div className="p-3 bg-[#2a1415]/70 border border-red-500/25 rounded-xl flex items-start gap-2.5">
+                      <AlertTriangle className="w-4 h-4 text-[#e57373] flex-shrink-0 mt-0.5" />
+                      <p className="text-[#ef9a9a] text-xs leading-relaxed">
                         Thermal radiance peak reached <strong>{profile.radiance} MW</strong> (+271% above site baseline, +{zScore.toFixed(1)}&sigma; deviation).
                       </p>
                     </div>
                   ) : (
-                    <div className="p-3 bg-tw-navy border border-tw-border rounded-lg flex items-start gap-2.5">
+                    <div className="p-3 bg-[#141714] border border-white/10 rounded-xl flex items-start gap-2.5">
                       <ShieldCheck className="w-4 h-4 text-tw-teal flex-shrink-0 mt-0.5" />
                       <p className="text-tw-text text-xs leading-relaxed">
                         Thermal radiance output: <strong>{profile.radiance} MW</strong> (Sensor Temp: {tempK.toFixed(1)} K, Z-Deviation: {zScore > 0 ? `+${zScore.toFixed(1)}` : zScore.toFixed(1)}&sigma;). Expected baseline for {profile.landUse}.
@@ -588,14 +593,14 @@ function SiteDetailContent() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Panel 1: Raw Satellite Sensor Telemetry */}
-                <div className="bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+                <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
                   <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-tw-border mb-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
                       <div className="flex items-center gap-2 text-xs font-bold uppercase text-tw-text">
                         <Satellite className="w-4 h-4 text-tw-teal" />
                         <span>Sensor Telemetry</span>
                       </div>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20">
                         Band I-4
                       </span>
                     </div>
@@ -607,7 +612,7 @@ function SiteDetailContent() {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-tw-muted">Brightness Temp:</span>
-                        <strong className="text-amber-400">{tempK.toFixed(1)} K ({(tempK - 273.15).toFixed(1)}°C)</strong>
+                        <strong className="text-[#ffb74d]">{tempK.toFixed(1)} K ({(tempK - 273.15).toFixed(1)}°C)</strong>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-tw-muted">Ground Sampling:</span>
@@ -628,20 +633,20 @@ function SiteDetailContent() {
                     </div>
                   </div>
 
-                  <div className="p-2.5 bg-tw-navy border border-tw-border/60 rounded-lg text-[11px] text-tw-muted font-mono">
+                  <div className="p-2.5 bg-[#141714] border border-white/10 rounded-xl text-[11px] text-tw-muted font-mono">
                     Direct polar overpass observation recorded at <strong>{utcString}</strong>.
                   </div>
                 </div>
 
                 {/* Panel 2: Baseline Deviation & GIS Spatial Geofence */}
-                <div className="bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg flex flex-col justify-between space-y-4">
+                <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-4">
                   <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-tw-border mb-3">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-3">
                       <div className="flex items-center gap-2 text-xs font-bold uppercase text-tw-text">
-                        <Compass className="w-4 h-4 text-indigo-400" />
+                        <Compass className="w-4 h-4 text-indigo-300" />
                         <span>GIS & Baseline Logic</span>
                       </div>
-                      <span className="text-[10px] font-mono text-indigo-300 bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
+                      <span className="text-[10px] font-mono text-indigo-300 bg-indigo-500/10 px-2.5 py-0.5 rounded-full border border-indigo-500/20">
                         PostGIS 10m
                       </span>
                     </div>
@@ -650,10 +655,10 @@ function SiteDetailContent() {
                       <div className="flex justify-between items-center">
                         <span className="text-tw-muted">Z-Score Deviation:</span>
                         <span
-                          className={`font-bold px-2 py-0.5 rounded text-xs ${
+                          className={`font-bold px-2.5 py-0.5 rounded-full text-xs ${
                             zScore > 2.0
-                              ? "bg-red-500/15 text-red-400 border border-red-500/30"
-                              : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                              ? "bg-[#2a1415] text-[#e57373] border border-red-500/25"
+                              : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
                           }`}
                         >
                           {zScore > 0 ? `+${zScore.toFixed(1)}` : zScore.toFixed(1)}&sigma;
@@ -662,7 +667,7 @@ function SiteDetailContent() {
 
                       <div className="flex justify-between items-start">
                         <span className="text-tw-muted">OSM Geofence:</span>
-                        <span className={`text-right font-medium ${isIndustrial ? "text-red-400" : "text-emerald-400"}`}>
+                        <span className={`text-right font-medium ${isIndustrial ? "text-[#e57373]" : "text-[#81c784]"}`}>
                           {isIndustrial ? "INSIDE Industrial Boundary" : "OUTSIDE Industrial Boundary"}
                         </span>
                       </div>
@@ -688,15 +693,15 @@ function SiteDetailContent() {
                     </div>
                   </div>
 
-                  <div className="p-2.5 bg-tw-navy border border-tw-border/60 rounded-lg text-[11px] text-tw-muted font-mono">
+                  <div className="p-2.5 bg-[#141714] border border-white/10 rounded-xl text-[11px] text-tw-muted font-mono">
                     Fusion of OpenStreetMap boundary polygons and ESA WorldCover 10m land use rasters.
                   </div>
                 </div>
 
                 {/* Panel 3: Explainable AI: SHAP TreeExplainer Attribution */}
-                <div className="bg-tw-surface border border-tw-border rounded-xl p-5 shadow-lg flex flex-col justify-between space-y-3">
+                <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-5 shadow-lg flex flex-col justify-between space-y-3">
                   <div>
-                    <div className="flex items-center justify-between pb-2 border-b border-tw-border mb-2">
+                    <div className="flex items-center justify-between pb-2 border-b border-white/10 mb-2">
                       <div className="flex items-center gap-2 text-xs font-bold uppercase text-tw-text">
                         <Cpu className="w-4 h-4 text-tw-teal" />
                         <span>SHAP TreeExplainer (&phi;<sub>i</sub>)</span>
@@ -708,7 +713,7 @@ function SiteDetailContent() {
 
                     {/* Diverging Bar Chart */}
                     <div className="space-y-2">
-                      <div className="flex justify-between items-center text-[10px] font-mono text-tw-dim border-b border-tw-border/60 pb-1">
+                      <div className="flex justify-between items-center text-[10px] font-mono text-tw-dim border-b border-white/10 pb-1">
                         <span>FEATURE</span>
                         <span>ATTRIBUTION (&phi;)</span>
                       </div>
@@ -725,18 +730,18 @@ function SiteDetailContent() {
                               </span>
                               <span
                                 className={`font-mono text-[11px] font-bold ${
-                                  isPositive ? "text-amber-400" : "text-sky-400"
+                                  isPositive ? "text-[#ffb74d]" : "text-[#64b5f6]"
                                 }`}
                               >
                                 {isPositive ? `+${f.shap_value.toFixed(3)}` : f.shap_value.toFixed(3)}
                               </span>
                             </div>
-                            <div className="w-full bg-tw-navy h-1.5 rounded-full overflow-hidden flex">
+                            <div className="w-full bg-[#141714] h-1.5 rounded-full overflow-hidden flex">
                               <div
                                 className={`h-full rounded-full ${
                                   isPositive
-                                    ? "bg-gradient-to-r from-amber-500 to-red-500"
-                                    : "bg-gradient-to-r from-sky-400 to-indigo-500"
+                                    ? "bg-gradient-to-r from-amber-600/80 to-[#e57373]"
+                                    : "bg-gradient-to-r from-sky-600/80 to-[#64b5f6]"
                                 }`}
                                 style={{ width: `${barWidth}%` }}
                               />
@@ -748,7 +753,7 @@ function SiteDetailContent() {
                   </div>
 
                   {/* Decision Synthesis Bullets */}
-                  <div className="pt-2 border-t border-tw-border/60 space-y-1">
+                  <div className="pt-2 border-t border-white/10 space-y-1">
                     <span className="text-[10px] font-mono uppercase text-tw-muted font-semibold block">
                       Operational Synthesis
                     </span>
@@ -766,8 +771,8 @@ function SiteDetailContent() {
 
           {/* ── Thermal Activity (Last 30 Days) Chart Section ────────────────── */}
           {(activeTab === "overview" || activeTab === "thermal") && (
-            <div className="bg-tw-surface border border-tw-border rounded-xl p-6 shadow-lg space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-tw-border">
+            <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl p-6 shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-white/10">
                 <div>
                   <h3 className="text-sm font-bold text-tw-text flex items-center gap-2">
                     <Activity className="w-4 h-4 text-tw-teal" />
@@ -781,14 +786,14 @@ function SiteDetailContent() {
                 {/* Legend & Spike Callout */}
                 <div className="flex items-center gap-4 text-xs">
                   <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-0.5 bg-red-500" />
+                    <span className="w-3 h-0.5 bg-[#e57373]" />
                     <span className="text-tw-muted">Thermal Radiance (MW)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="w-3 h-0.5 bg-sky-500 border-dashed" />
+                    <span className="w-3 h-0.5 bg-[#64b5f6] border-dashed" />
                     <span className="text-tw-muted">Baseline</span>
                   </div>
-                  <div className="px-2.5 py-1 bg-red-500/10 border border-red-500/30 text-red-400 font-bold rounded font-mono">
+                  <div className="px-3 py-1 bg-[#2a1415] border border-red-500/25 text-[#e57373] font-bold rounded-full font-mono text-xs">
                     Observed: {profile.radiance} MW
                   </div>
                 </div>
@@ -801,8 +806,8 @@ function SiteDetailContent() {
 
           {/* ── Recent Classifications Table ───────────────────────────────── */}
           {(activeTab === "overview" || activeTab === "history") && (
-            <div className="bg-tw-surface border border-tw-border rounded-xl overflow-hidden shadow-lg">
-              <div className="p-4 border-b border-tw-border">
+            <div className="bg-[#181b17]/90 border border-white/10 rounded-2xl overflow-hidden shadow-lg">
+              <div className="p-4 border-b border-white/10">
                 <h3 className="text-sm font-bold text-tw-text">
                   Recent Classifications
                 </h3>
@@ -814,7 +819,7 @@ function SiteDetailContent() {
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse text-xs">
                   <thead>
-                    <tr className="bg-tw-navy/50 text-tw-muted border-b border-tw-border font-medium">
+                    <tr className="bg-[#141714]/80 text-tw-muted border-b border-white/10 font-semibold tracking-wide uppercase text-[10px]">
                       <th className="p-3.5">Date</th>
                       <th className="p-3.5">Type</th>
                       <th className="p-3.5">Confidence</th>
@@ -822,11 +827,11 @@ function SiteDetailContent() {
                       <th className="p-3.5">Notes</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-tw-border">
+                  <tbody className="divide-y divide-white/5">
                     {profile.recentClassifications.map((row, idx) => (
                       <tr
                         key={idx}
-                        className="hover:bg-tw-raised/40 transition-colors"
+                        className="hover:bg-white/[0.03] transition-colors"
                       >
                         <td className="p-3.5 font-mono text-tw-muted">
                           {row.date}

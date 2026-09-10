@@ -60,7 +60,7 @@ export function ClassificationCards() {
             Understand the source behind the heat.
           </h2>
           <p className="text-tw-muted text-sm leading-relaxed">
-            ThermoWatch classifies every thermal detection into distinct operational
+            The platform classifies every thermal detection into distinct operational
             categories using satellite telemetry, geospatial context and ML model inference.
           </p>
         </div>

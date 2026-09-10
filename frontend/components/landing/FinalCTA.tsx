@@ -8,7 +8,7 @@ export function FinalCTA() {
       className="py-24 px-6 border-t border-tw-border relative overflow-hidden text-center"
       style={{
         background:
-          "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(13,148,136,0.12) 0%, transparent 70%), #0a0e1a",
+          "radial-gradient(ellipse 80% 60% at 50% 100%, rgba(120,134,107,0.1) 0%, transparent 70%), #141714",
       }}
     >
       {/* Background industrial graphic pattern */}
@@ -16,7 +16,7 @@ export function FinalCTA() {
         className="absolute inset-0 pointer-events-none opacity-20"
         style={{
           backgroundImage: `
-            radial-gradient(circle at 50% 50%, rgba(249,87,56,0.15) 0%, transparent 60%)
+            radial-gradient(circle at 50% 50%, rgba(192,86,33,0.15) 0%, transparent 60%)
           `,
         }}
       />
@@ -29,7 +29,7 @@ export function FinalCTA() {
         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-tw-text tracking-tight leading-tight">
           See the Heat.
           <br />
-          <span className="text-tw-teal">Understand the Threat.</span>
+          <span className="text-tw-orange">Understand the Threat.</span>
         </h2>
 
         <p className="text-tw-muted text-base max-w-xl mx-auto leading-relaxed">
@@ -39,7 +39,7 @@ export function FinalCTA() {
         <div className="pt-4">
           <Link
             href="/dashboard"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#f95738] to-[#ff3b30] hover:from-[#ff6b4a] hover:to-[#f95738] text-white text-base font-bold rounded-xl shadow-xl shadow-tw-orange/25 transition-all hover:scale-105"
+            className="inline-flex items-center gap-3 px-8 py-4 bg-tw-orange hover:bg-tw-orange-hi text-tw-text text-base font-bold rounded-xl shadow-lg shadow-tw-orange/20 border border-tw-text/15 transition-all hover:scale-105"
           >
             Launch the Intelligence Map
             <ArrowRight className="w-5 h-5" />

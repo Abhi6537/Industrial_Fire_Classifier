@@ -7,21 +7,21 @@ const SEVERITY_CONFIG: Record<
 > = {
   high: {
     label: "High",
-    bg: "rgba(220,38,38,0.15)",
-    color: "#ef4444",
-    border: "rgba(220,38,38,0.35)",
+    bg: "rgba(229, 115, 115, 0.12)",
+    color: "#e57373",
+    border: "rgba(229, 115, 115, 0.25)",
   },
   medium: {
     label: "Medium",
-    bg: "rgba(217,119,6,0.15)",
-    color: "#f59e0b",
-    border: "rgba(217,119,6,0.35)",
+    bg: "rgba(255, 183, 77, 0.12)",
+    color: "#ffb74d",
+    border: "rgba(255, 183, 77, 0.25)",
   },
   low: {
     label: "Low",
-    bg: "rgba(34,197,94,0.15)",
-    color: "#22c55e",
-    border: "rgba(34,197,94,0.35)",
+    bg: "rgba(129, 199, 132, 0.12)",
+    color: "#81c784",
+    border: "rgba(129, 199, 132, 0.25)",
   },
 };
 
@@ -30,7 +30,7 @@ export function SeverityBadge({ severity }: { severity: SeverityLevel }) {
 
   return (
     <span
-      className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider"
+      className="inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider"
       style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
     >
       {cfg.label}
