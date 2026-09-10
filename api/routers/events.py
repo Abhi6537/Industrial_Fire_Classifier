@@ -32,3 +32,18 @@ def list_classified_events(
         limit=limit,
     )
     return events
+
+
+@router.get("/{event_id}", response_model=ClassifiedEventResponse)
+def get_classified_event_by_id(
+    event_id: str,
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Returns full telemetry and explainability payload for a single classified anomaly event.
+    """
+    event = db.get_event_by_id(event_id=event_id)
+    if not event:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail=f"Anomaly event '{event_id}' not found.")
+    return event

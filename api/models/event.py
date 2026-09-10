@@ -21,6 +21,10 @@ class ClassifiedEventResponse(BaseModel):
     site_name: Optional[str] = "None"
     site_type: Optional[str] = "none"
     classified_at: Optional[str] = None
+    detected_at: Optional[str] = None
+    frp: Optional[float] = None
+    brightness_temp: Optional[float] = None
+    distance_to_nearest_facility_km: Optional[float] = None
     shap_explanation: Optional[Dict[str, Any]] = None
 
     class Config:

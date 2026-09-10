@@ -275,13 +275,38 @@ class DatabaseService:
 
                     lat = det.get("latitude") or ev.get("latitude") or metrics.get("latitude", 0.0)
                     lon = det.get("longitude") or ev.get("longitude") or metrics.get("longitude", 0.0)
-                    site_name = site.get("name") or ev.get("site_name") or "None"
-                    site_type = site.get("site_type") or ev.get("site_type") or "none"
+                    
+                    # Descriptive location name
+                    if site.get("name") and site.get("name") != "None":
+                        site_name = site.get("name")
+                    elif ev.get("site_name") and ev.get("site_name") != "None":
+                        site_name = ev.get("site_name")
+                    elif ev.get("land_cover_type") == "farmland":
+                        site_name = f"Farmland / Cropland ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    elif ev.get("land_cover_type") == "forest":
+                        site_name = f"Forest Canopy Reserve ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    elif ev.get("land_cover_type") == "industrial":
+                        site_name = f"Industrial Cluster ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    else:
+                        site_name = f"Unmapped Sector ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+
+                    site_type = site.get("site_type") or ev.get("site_type") or ("industrial" if ev.get("on_known_site") else "rural")
+                    
+                    # Real overpass timestamp & physical radiometry
+                    detected_at = det.get("detected_at") or ev.get("detected_at") or ev.get("classified_at")
+                    frp = float(det.get("frp") if det.get("frp") is not None else metrics.get("frp_mw", 0.0))
+                    brightness_temp = float(det.get("brightness_temp") if det.get("brightness_temp") is not None else metrics.get("brightness_temp_k", 0.0))
+
+                    dist_km = float(metrics.get("distance_to_nearest_facility_km", 0.0))
 
                     ev["latitude"] = float(lat)
                     ev["longitude"] = float(lon)
                     ev["site_name"] = str(site_name)
                     ev["site_type"] = str(site_type)
+                    ev["detected_at"] = detected_at
+                    ev["frp"] = frp
+                    ev["brightness_temp"] = brightness_temp
+                    ev["distance_to_nearest_facility_km"] = dist_km
                     events.append(ev)
 
                 if len(events) > 0:
@@ -298,6 +323,57 @@ class DatabaseService:
         if is_anomaly is not None:
             filtered = [e for e in filtered if e.get("is_anomaly") == is_anomaly]
         return filtered[:limit]
+
+    def get_event_by_id(self, event_id: str) -> Optional[Dict[str, Any]]:
+        """Returns a single classified event with full telemetry by ID."""
+        if self.is_connected and self.client:
+            try:
+                res = self.client.table("classified_events").select(
+                    "*, detections(latitude, longitude, frp, brightness_temp, detected_at), sites(name, site_type)"
+                ).eq("id", event_id).execute()
+                if res.data and len(res.data) > 0:
+                    ev = res.data[0]
+                    det = ev.get("detections") or {}
+                    site = ev.get("sites") or {}
+                    metrics = (ev.get("shap_explanation") or {}).get("metrics") or {}
+
+                    lat = det.get("latitude") or ev.get("latitude") or metrics.get("latitude", 0.0)
+                    lon = det.get("longitude") or ev.get("longitude") or metrics.get("longitude", 0.0)
+                    
+                    if site.get("name") and site.get("name") != "None":
+                        site_name = site.get("name")
+                    elif ev.get("land_cover_type") == "farmland":
+                        site_name = f"Farmland Cropland Sector ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    elif ev.get("land_cover_type") == "forest":
+                        site_name = f"Forest Canopy Reserve ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    elif ev.get("land_cover_type") == "industrial":
+                        site_name = f"Industrial Complex ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+                    else:
+                        site_name = f"Thermal Sector ({float(lat):.2f}°N, {float(lon):.2f}°E)"
+
+                    site_type = site.get("site_type") or ev.get("site_type") or ("industrial" if ev.get("on_known_site") else "rural")
+                    detected_at = det.get("detected_at") or ev.get("detected_at") or ev.get("classified_at")
+                    frp = float(det.get("frp") if det.get("frp") is not None else metrics.get("frp_mw", 0.0))
+                    brightness_temp = float(det.get("brightness_temp") if det.get("brightness_temp") is not None else metrics.get("brightness_temp_k", 0.0))
+                    dist_km = float(metrics.get("distance_to_nearest_facility_km", 0.0))
+
+                    ev["latitude"] = float(lat)
+                    ev["longitude"] = float(lon)
+                    ev["site_name"] = str(site_name)
+                    ev["site_type"] = str(site_type)
+                    ev["detected_at"] = detected_at
+                    ev["frp"] = frp
+                    ev["brightness_temp"] = brightness_temp
+                    ev["distance_to_nearest_facility_km"] = dist_km
+                    return ev
+            except Exception as e:
+                logger.error(f"Error querying event {event_id} from Supabase: {e}")
+
+        # Check mock events
+        for ev in self._mock_events:
+            if ev.get("id") == event_id:
+                return ev
+        return None
 
     def get_alerts(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
         """Returns active operational alerts."""

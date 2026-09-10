@@ -27,6 +27,9 @@ export interface ClassifiedEvent {
   is_anomaly: boolean;
   site_name?: string;
   site_type?: string;
+  frp?: number;
+  brightness_temp?: number;
+  detected_at?: string;
   classified_at?: string;
   shap_explanation?: {
     summary: string;
@@ -157,6 +160,20 @@ export async function fetchEvents(label?: string, severity?: string): Promise<Cl
         },
       },
     ];
+  }
+}
+
+export async function fetchEventById(id: string): Promise<ClassifiedEvent | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/events/${id}`, {
+      headers: { Authorization: "Bearer dev-analyst-token" },
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Failed to fetch event ${id}`);
+    return await res.json();
+  } catch (err) {
+    console.warn(`Could not fetch event ${id} directly, checking cached events:`, err);
+    return null;
   }
 }
 

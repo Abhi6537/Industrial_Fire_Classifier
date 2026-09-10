@@ -15,10 +15,43 @@ interface ThermalMapProps {
   className?: string;
 }
 
+const DEFAULT_DEMO_SITES = [
+  {
+    name: "Dahej Petroleum & Chemical Complex (PCPIR)",
+    type: "chemical",
+    bounds: [
+      [21.700, 72.570],
+      [21.725, 72.570],
+      [21.725, 72.595],
+      [21.700, 72.595],
+    ],
+  },
+  {
+    name: "Reliance Jamnagar Refinery Complex",
+    type: "refinery",
+    bounds: [
+      [22.340, 69.850],
+      [22.370, 69.850],
+      [22.370, 69.880],
+      [22.340, 69.880],
+    ],
+  },
+  {
+    name: "Hazira Port & Petrochemical Manufacturing Hub",
+    type: "steel",
+    bounds: [
+      [21.090, 72.630],
+      [21.115, 72.630],
+      [21.115, 72.660],
+      [21.090, 72.660],
+    ],
+  },
+];
+
 // ─── Popup HTML builder ────────────────────────────────────────────────────
 
 function buildPopupHTML(d: ThermalDetection): string {
-  const meta = CLASSIFICATION_META[d.classification];
+  const meta = CLASSIFICATION_META[d.classification] || CLASSIFICATION_META.unknown_anomaly;
   const severityColor =
     d.severity === "high"
       ? "#dc2626"
@@ -26,11 +59,28 @@ function buildPopupHTML(d: ThermalDetection): string {
       ? "#d97706"
       : "#16a34a";
 
+  const devScoreStr =
+    d.deviationScore !== undefined
+      ? `<div style="display: flex; justify-content: space-between; font-size: 11px;">
+          <span style="color: #64748b;">Z-Deviation</span>
+          <span style="color: ${d.deviationScore > 2.0 ? "#ef4444" : "#38bdf8"}; font-weight: 700; font-family: monospace;">
+            ${d.deviationScore > 0 ? `+${d.deviationScore.toFixed(1)}` : d.deviationScore.toFixed(1)}σ
+          </span>
+        </div>`
+      : "";
+
+  const shapDriverStr =
+    d.shapExplanation?.primary_factors?.[0]
+      ? `<div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10px; color: #94a3b8; line-height: 1.3;">
+          <strong style="color: #cbd5e1;">SHAP Decision Driver:</strong> ${d.shapExplanation.primary_factors[0]}
+        </div>`
+      : "";
+
   return `
     <div style="
       font-family: var(--font-inter, system-ui, sans-serif);
       padding: 14px 16px;
-      min-width: 230px;
+      min-width: 250px;
     ">
       <div style="
         font-size: 10px;
@@ -39,7 +89,7 @@ function buildPopupHTML(d: ThermalDetection): string {
         text-transform: uppercase;
         color: #64748b;
         margin-bottom: 6px;
-      ">Thermal Anomaly</div>
+      ">Live VIIRS Satellite Anomaly</div>
 
       <div style="font-size: 13px; font-weight: 600; color: #e2e8f0; margin-bottom: 10px; line-height: 1.3;">
         ${d.facilityName}
@@ -66,20 +116,22 @@ function buildPopupHTML(d: ThermalDetection): string {
           <span style="color: #e2e8f0; font-weight: 600;">${d.confidence}%</span>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px;">
-          <span style="color: #64748b;">Radiance</span>
-          <span style="color: #e2e8f0;">${d.radiance} MW</span>
+          <span style="color: #64748b;">Radiance (FRP)</span>
+          <span style="color: #e2e8f0; font-weight: bold; font-family: monospace;">${d.radiance} MW</span>
         </div>
+        ${devScoreStr}
         <div style="display: flex; justify-content: space-between; font-size: 11px;">
           <span style="color: #64748b;">Severity</span>
           <span style="color: ${severityColor}; font-weight: 600; text-transform: uppercase; font-size: 10px;">${d.severity}</span>
         </div>
         <div style="display: flex; justify-content: space-between; font-size: 11px;">
-          <span style="color: #64748b;">Detected</span>
-          <span style="color: #94a3b8; font-size: 10px;">${formatTimestamp(d.timestamp)}</span>
+          <span style="color: #64748b;">Overpass</span>
+          <span style="color: #94a3b8; font-size: 10px; font-family: monospace;">${formatTimestamp(d.timestamp)}</span>
         </div>
+        ${shapDriverStr}
       </div>
 
-      <a href="/site/${d.facilityId ?? "demo"}" style="
+      <a href="/site/${d.id}" style="
         display: block;
         text-align: center;
         background: rgba(13, 148, 136, 0.15);
@@ -91,7 +143,7 @@ function buildPopupHTML(d: ThermalDetection): string {
         font-weight: 600;
         text-decoration: none;
         transition: background 0.15s;
-      ">View Details →</a>
+      ">Inspect Facility Intelligence →</a>
     </div>
   `;
 }
@@ -99,7 +151,7 @@ function buildPopupHTML(d: ThermalDetection): string {
 // ─── Marker icon HTML builder ──────────────────────────────────────────────
 
 function buildMarkerHTML(d: ThermalDetection): string {
-  const meta = CLASSIFICATION_META[d.classification];
+  const meta = CLASSIFICATION_META[d.classification] || CLASSIFICATION_META.unknown_anomaly;
   const isHigh = d.severity === "high";
   const size = isHigh ? 14 : 10;
   const ringSize = isHigh ? 28 : 20;
@@ -121,10 +173,10 @@ function buildMarkerHTML(d: ThermalDetection): string {
       <div style="
         width: ${size}px;
         height: ${size}px;
-        border-radius: ${d.classification === "unknown_anomaly" ? "3px" : "50%"};
+        border-radius: 50%;
         background: ${meta.color};
-        border: 1.5px solid rgba(255,255,255,0.25);
-        box-shadow: 0 0 6px ${meta.color}60;
+        box-shadow: 0 0 ${isHigh ? 10 : 5}px ${meta.color}80;
+        border: 2px solid #0f172a;
         position: relative;
         z-index: 1;
       "></div>
@@ -132,13 +184,13 @@ function buildMarkerHTML(d: ThermalDetection): string {
   `;
 }
 
-// ─── Component ────────────────────────────────────────────────────────────
+// ─── Component ─────────────────────────────────────────────────────────────
 
 export function ThermalMap({
   detections,
-  height = 480,
-  center = [20.5, 78.9],
-  zoom = 5,
+  height = 560,
+  center = [21.5, 73.0],
+  zoom = 6,
   className = "",
 }: ThermalMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -146,7 +198,7 @@ export function ThermalMap({
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
 
-  // Initialise map once on mount
+  // Initialize Leaflet Map
   useEffect(() => {
     if (typeof window === "undefined" || !containerRef.current || mapRef.current) return;
 
@@ -162,15 +214,80 @@ export function ThermalMap({
         attributionControl: true,
       });
 
-      // Esri World Dark Gray Base (Free, no API key required)
-      L.tileLayer(
+      const cartoKey =
+        process.env.NEXT_PUBLIC_CARTO_API_KEY ||
+        "a_live_e388efd464db3b723ea67fce51a88b57731ce3ba";
+
+      // 1. Tactical Dark Canvas (Esri World Dark Gray Base)
+      const tacticalDark = L.tileLayer(
         "https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}",
         {
           attribution:
-            '&copy; <a href="https://www.esri.com/">Esri</a> &copy; OpenStreetMap | NASA FIRMS',
+            '&copy; <a href="https://www.esri.com/">Esri</a> &copy; OpenStreetMap | NASA FIRMS VIIRS',
           maxZoom: 16,
         }
-      ).addTo(map);
+      );
+
+      // 2. High-Resolution Satellite Recon (Esri World Imagery)
+      const satelliteRecon = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          attribution:
+            "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics",
+          maxZoom: 18,
+        }
+      );
+
+      // 3. CARTO Dark Matter (High-contrast dark mode)
+      const cartoDark = L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        {
+          attribution:
+            '&copy; <a href="https://carto.com/">CARTO</a> | &copy; OpenStreetMap | NASA FIRMS',
+          subdomains: "abcd",
+          maxZoom: 20,
+        }
+      );
+
+      // 4. CARTO Voyager (Street & Infrastructure Topo)
+      const cartoVoyager = L.tileLayer(
+        `https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=${cartoKey}`,
+        {
+          attribution:
+            '&copy; <a href="https://carto.com/">CARTO</a> | &copy; OpenStreetMap',
+          subdomains: "abcd",
+          maxZoom: 20,
+        }
+      );
+
+      // Default to Tactical Dark
+      tacticalDark.addTo(map);
+
+      // Add Basemap Layer Switcher Control (Top Right)
+      const baseMaps = {
+        "Tactical Dark": tacticalDark,
+        "Satellite Recon (Imagery)": satelliteRecon,
+        "CARTO Dark Matter": cartoDark,
+        "CARTO Voyager (Street)": cartoVoyager,
+      };
+
+      L.control.layers(baseMaps, undefined, { position: "topright" }).addTo(map);
+
+      // Render OSM Industrial Polygons (Dahej, Jamnagar, Hazira)
+      DEFAULT_DEMO_SITES.forEach((site) => {
+        const poly = L.polygon(site.bounds as any, {
+          color: "#38bdf8",
+          weight: 1.5,
+          dashArray: "5, 5",
+          fillColor: "#0284c7",
+          fillOpacity: 0.15,
+        });
+        poly.bindTooltip(
+          `<strong>${site.name}</strong><br><span style="font-size:10px;color:#cbd5e1;">OSM Industrial Zone (${site.type})</span>`,
+          { sticky: true }
+        );
+        poly.addTo(map);
+      });
 
       // Custom zoom control (bottom right)
       L.control.zoom({ position: "bottomright" }).addTo(map);
@@ -212,7 +329,7 @@ export function ThermalMap({
         const marker = L.marker([detection.lat, detection.lng], { icon });
 
         marker.bindPopup(buildPopupHTML(detection), {
-          maxWidth: 260,
+          maxWidth: 280,
           className: "thermowatch-popup",
         });
 
@@ -232,34 +349,29 @@ export function ThermalMap({
       {/* Legend overlay */}
       <div className="absolute bottom-4 left-4 z-[999] bg-tw-surface/90 backdrop-blur-sm border border-tw-border rounded-lg p-3 text-xs flex flex-col gap-2">
         <p className="text-tw-muted font-semibold uppercase tracking-wider text-[10px]">
-          Classification
+          Classification Legend
         </p>
-        {(
-          [
-            "industrial_fire",
-            "gas_flare",
-            "persistent_source",
-            "agricultural_burn",
-            "natural_fire",
-            "unknown_anomaly",
-          ] as const
-        ).map((cls) => {
-          const meta = CLASSIFICATION_META[cls];
-          return (
-            <div key={cls} className="flex items-center gap-2">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+          {Object.entries(CLASSIFICATION_META).map(([key, meta]) => (
+            <div key={key} className="flex items-center gap-2">
               <span
-                className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                className="w-2 h-2 rounded-full flex-shrink-0"
                 style={{ backgroundColor: meta.color }}
               />
-              <span className="text-tw-text/80">{meta.label}</span>
+              <span className="text-tw-muted text-[11px]">{meta.label}</span>
             </div>
-          );
-        })}
+          ))}
+          <div className="flex items-center gap-2 col-span-2 pt-1 border-t border-tw-border">
+            <span className="w-3 h-2 border border-sky-400 border-dashed bg-sky-500/20 rounded-[1px] flex-shrink-0" />
+            <span className="text-tw-muted text-[10px] font-mono">OSM Industrial Boundary</span>
+          </div>
+        </div>
       </div>
 
-      {/* Detection count badge */}
-      <div className="absolute top-3 right-3 z-[999] bg-tw-surface/90 backdrop-blur-sm border border-tw-border rounded-full px-3 py-1 text-[11px] font-medium text-tw-muted">
-        {detections.length} detections
+      {/* Detection count pill */}
+      <div className="absolute top-4 left-4 z-[999] bg-tw-surface/95 backdrop-blur-md border border-tw-border rounded-lg px-3 py-1.5 text-xs text-tw-text font-mono font-semibold flex items-center gap-2 shadow-md">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+        <span>{detections.length} Satellite Detections</span>
       </div>
     </div>
   );

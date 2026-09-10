@@ -70,12 +70,21 @@ export interface ThermalDetection {
   severity: SeverityLevel;
   status: IncidentStatus;
   timestamp: string;
+  deviationScore?: number;
+  shapExplanation?: any;
+  brightnessTemp?: number;
+  landCoverType?: string;
+  persistenceCount?: number;
+  onKnownSite?: boolean;
+  distanceToNearestFacilityKm?: number;
+  detectedAt?: string;
 }
 
 export function formatTimestamp(ts: string): string {
   try {
     const d = new Date(ts);
     return d.toLocaleString("en-US", {
+      timeZone: "Asia/Kolkata",
       month: "short",
       day: "numeric",
       hour: "2-digit",
