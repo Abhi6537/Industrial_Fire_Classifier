@@ -17,6 +17,11 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from ml.features import FeatureExtractor, LABEL_CLASSES
 from ml.explain import ExplainabilityEngine
+from ml.isolation_forest import iforest_service, IsolationForestService
+from ml.conformal import conformal_service
+from ingestion.evidential_fusion import fusion_engine
+from ml.spatial_gnn import spatial_gnn_service
+from ml.temporal_attention import temporal_attention_service
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("predict")
@@ -66,6 +71,11 @@ class ClassifierService:
         - confidence: float (0.0 to 1.0)
         - severity: 'critical' | 'warning' | 'info'
         - is_anomaly: bool
+        - isolation_anomaly_score, is_isolation_outlier, dual_engine_status
+        - conformal_prediction_set, conformal_confidence_level, conformal_set_size,
+          is_conformal_single_class, is_conformal_ambiguous
+        - fused_hazard_probability, fused_flare_probability, belief_fire,
+          plausibility_fire, sensor_conflict_k, fusion_verdict
         - shap_explanation: dict
         """
         if enriched_df.empty:
@@ -79,6 +89,113 @@ class ClassifierService:
         confidences = np.max(probs, axis=1)
 
         predicted_labels = self.encoder.inverse_transform(pred_indices)
+
+        # Unsupervised Isolation Forest Anomaly Scoring (Engine B)
+        isolation_scores, is_outliers = iforest_service.score_detections(X)
+
+        # Conformal Prediction Uncertainty Sets (P3.1 Milestone)
+        conformal_res = conformal_service.batch_predict_sets(probs, alpha=0.10)
+        df["conformal_prediction_set"] = conformal_res["conformal_prediction_set"]
+        df["conformal_confidence_level"] = conformal_res["conformal_confidence_level"]
+        df["conformal_set_size"] = conformal_res["conformal_set_size"]
+        df["is_conformal_single_class"] = conformal_res["is_conformal_single_class"]
+        df["is_conformal_ambiguous"] = conformal_res["is_conformal_ambiguous"]
+
+        dual_statuses: List[str] = []
+        for idx in range(len(df)):
+            eval_res = IsolationForestService.evaluate_dual_engine(
+                supervised_label=str(predicted_labels[idx]),
+                supervised_confidence=float(confidences[idx]),
+                isolation_score=float(isolation_scores[idx]),
+            )
+            status_val = eval_res["dual_engine_status"]
+
+            # Mission-Critical Triage: If conformal set is ambiguous and contains industrial_fire, flag it
+            conf_set = conformal_res["conformal_prediction_set"][idx]
+            is_ambig = conformal_res["is_conformal_ambiguous"][idx]
+            if is_ambig and "industrial_fire" in conf_set and predicted_labels[idx] != "industrial_fire":
+                if status_val == "VERIFIED_ROUTINE_OPERATION":
+                    status_val = "CONFORMAL_AMBIGUOUS_HAZARD"
+
+            dual_statuses.append(status_val)
+
+        df["isolation_anomaly_score"] = isolation_scores
+        df["is_isolation_outlier"] = is_outliers
+        df["dual_engine_status"] = dual_statuses
+
+        # Multi-Sensor Evidential Fusion (P3.2 Milestone)
+        fused_hazard_probs: List[float] = []
+        fused_flare_probs: List[float] = []
+        beliefs_fire: List[float] = []
+        plausibilities_fire: List[float] = []
+        sensor_conflicts_k: List[float] = []
+        fusion_verdicts: List[str] = []
+
+        for idx, (_, row) in enumerate(df.iterrows()):
+            fusion_input = row.to_dict()
+            fusion_res = fusion_engine.evaluate_event(fusion_input)
+            fused_hazard_probs.append(fusion_res["fused_hazard_probability"])
+            fused_flare_probs.append(fusion_res["fused_flare_probability"])
+            beliefs_fire.append(fusion_res["belief_fire"])
+            plausibilities_fire.append(fusion_res["plausibility_fire"])
+            sensor_conflicts_k.append(fusion_res["sensor_conflict_k"])
+            fusion_verdicts.append(fusion_res["fusion_verdict"])
+
+        df["fused_hazard_probability"] = fused_hazard_probs
+        df["fused_flare_probability"] = fused_flare_probs
+        df["belief_fire"] = beliefs_fire
+        df["plausibility_fire"] = plausibilities_fire
+        df["sensor_conflict_k"] = sensor_conflicts_k
+        df["fusion_verdict"] = fusion_verdicts
+
+        # Spatial Graph Neural Network (P5.2 Milestone)
+        hotspot_records = df.to_dict(orient="records")
+        gnn_cluster_ids: List[str] = []
+        gnn_cluster_sizes: List[int] = []
+        gnn_morphologies: List[str] = []
+        gnn_densities: List[float] = []
+        gnn_clusterings: List[float] = []
+        gnn_elongations: List[float] = []
+        gnn_ind_probs: List[float] = []
+        gnn_wf_probs: List[float] = []
+
+        for idx in range(len(df)):
+            gnn_res = spatial_gnn_service.analyze_hotspot_graph(hotspot_records, target_index=idx)
+            gnn_cluster_ids.append(gnn_res["gnn_cluster_id"])
+            gnn_cluster_sizes.append(gnn_res["gnn_cluster_size"])
+            gnn_morphologies.append(gnn_res["gnn_cluster_morphology"])
+            gnn_densities.append(gnn_res["gnn_graph_density"])
+            gnn_clusterings.append(gnn_res["gnn_clustering_coefficient"])
+            gnn_elongations.append(gnn_res["gnn_spatial_elongation"])
+            gnn_ind_probs.append(gnn_res["gnn_industrial_topology_prob"])
+            gnn_wf_probs.append(gnn_res["gnn_wildfire_topology_prob"])
+
+        df["gnn_cluster_id"] = gnn_cluster_ids
+        df["gnn_cluster_size"] = gnn_cluster_sizes
+        df["gnn_cluster_morphology"] = gnn_morphologies
+        df["gnn_graph_density"] = gnn_densities
+        df["gnn_clustering_coefficient"] = gnn_clusterings
+        df["gnn_spatial_elongation"] = gnn_elongations
+        df["gnn_industrial_topology_prob"] = gnn_ind_probs
+        df["gnn_wildfire_topology_prob"] = gnn_wf_probs
+
+        # Attention-Based Temporal Sequence Model (P5.3 Milestone)
+        temp_labels: List[str] = []
+        temp_peaks: List[int] = []
+        temp_stabilities: List[float] = []
+        temp_confs: List[float] = []
+
+        for idx, (_, row) in enumerate(df.iterrows()):
+            t_res = temporal_attention_service.evaluate_event(row.to_dict())
+            temp_labels.append(t_res["temporal_signature_label"])
+            temp_peaks.append(t_res["temporal_attention_peak_pass"])
+            temp_stabilities.append(t_res["temporal_stability_index"])
+            temp_confs.append(t_res["temporal_profile_confidence"])
+
+        df["temporal_signature_label"] = temp_labels
+        df["temporal_attention_peak_pass"] = temp_peaks
+        df["temporal_stability_index"] = temp_stabilities
+        df["temporal_profile_confidence"] = temp_confs
 
         severities: List[str] = []
         is_anomalies: List[bool] = []
@@ -94,12 +211,22 @@ class ClassifierService:
 
         for idx, (_, row) in enumerate(df.iterrows()):
             label = predicted_labels[idx]
+            conf_set = conformal_res["conformal_prediction_set"][idx]
+            is_ambig = conformal_res["is_conformal_ambiguous"][idx]
 
             # Determine severity
             if label == "industrial_fire":
                 severity = "critical"
                 is_anomaly = True
             elif label in ("unregistered_anomaly", "wildfire"):
+                severity = "warning"
+                is_anomaly = True
+            elif is_outliers[idx]:
+                # If Isolation Forest identifies an extreme structural outlier on known site
+                severity = "warning"
+                is_anomaly = True
+            elif is_ambig and "industrial_fire" in conf_set:
+                # Conformal set cannot statistically exclude industrial fire at 90% confidence
                 severity = "warning"
                 is_anomaly = True
             else:
