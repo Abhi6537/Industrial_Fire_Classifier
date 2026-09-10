@@ -1,8 +1,7 @@
 """
-Historical Incident Replay Engine
-Smart India Hackathon 2026 | NTRO Ground-Truth Proof Point
-Replays the documented June 3, 2020 Dahej Chemical Industrial Explosion (Gujarat)
-Validates that the system flags the emergency via deviation modeling while routine flares stay normal.
+Historical Incident Replay
+Replays satellite thermal anomaly timeline for the June 3, 2020 Dahej Chemical Plant incident
+alongside continuous routine flaring at Reliance Jamnagar Refinery.
 """
 
 import os
@@ -19,8 +18,7 @@ from ml.predict import ClassifierService
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s]: %(message)s")
 logger = logging.getLogger("incident_replay")
 
-# Documented Historical Incident: Dahej Chemical Plant BLEVE / Explosion (June 3, 2020)
-# Side-by-side Control: Reliance Jamnagar Refinery (Continuous Routine Flaring)
+# Timeline data: Dahej chemical disaster sequence vs Jamnagar operational flaring
 TIMELINE_DATA = [
     # Day T-2: June 1, 2020 (Pre-Incident Normal Operations)
     {

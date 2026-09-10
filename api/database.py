@@ -105,11 +105,28 @@ class DatabaseService:
                 "classified_at": now,
                 "shap_explanation": {
                     "summary": "Classified as INDUSTRIAL_FIRE (94.2% confidence)",
+                    "base_value": 0.1662,
                     "primary_factors": [
                         "Severe thermal power output detected (165.8 MW).",
                         "Statistical deviation: 4.8 sigma above historical baseline.",
                         "Spatial intersection with chemical manufacturing facility.",
                     ],
+                    "shap_factors": [
+                        {"feature": "deviation_score", "label": "Baseline Deviation", "unit": "sigma", "value": 4.8, "shap_value": 0.2845, "impact": "positive"},
+                        {"feature": "frp", "label": "Fire Radiative Power (FRP)", "unit": "MW", "value": 165.8, "shap_value": 0.2312, "impact": "positive"},
+                        {"feature": "on_known_site", "label": "Industrial Site Intersect", "unit": "", "value": 1, "shap_value": 0.1420, "impact": "positive"},
+                        {"feature": "site_type_encoded", "label": "Site Facility Type", "unit": "", "value": "chemical", "shap_value": 0.0890, "impact": "positive"},
+                        {"feature": "brightness_temp", "label": "Brightness Temperature", "unit": "K", "value": 385.2, "shap_value": 0.0654, "impact": "positive"},
+                        {"feature": "persistence_count", "label": "Multi-Temporal Persistence", "unit": "passes", "value": 2, "shap_value": -0.0380, "impact": "negative"},
+                    ],
+                    "metrics": {
+                        "frp_mw": 165.8,
+                        "brightness_temp_k": 385.2,
+                        "deviation_z_score": 4.8,
+                        "persistence_count": 2,
+                        "distance_to_nearest_facility_km": 0.0,
+                        "on_known_site": True,
+                    },
                 },
             },
             {
@@ -128,10 +145,26 @@ class DatabaseService:
                 "classified_at": now,
                 "shap_explanation": {
                     "summary": "Classified as NORMAL_FLARE (98.5% confidence)",
+                    "base_value": 0.1662,
                     "primary_factors": [
                         "Stationary flare observed across 48 consecutive satellite passes.",
                         "Thermal power (42.1 MW) is within normal operating limits (0.1 sigma).",
                     ],
+                    "shap_factors": [
+                        {"feature": "persistence_count", "label": "Multi-Temporal Persistence", "unit": "passes", "value": 48, "shap_value": 0.3620, "impact": "positive"},
+                        {"feature": "site_type_encoded", "label": "Site Facility Type", "unit": "", "value": "refinery", "shap_value": 0.2410, "impact": "positive"},
+                        {"feature": "deviation_score", "label": "Baseline Deviation", "unit": "sigma", "value": 0.1, "shap_value": 0.1980, "impact": "positive"},
+                        {"feature": "on_known_site", "label": "Industrial Site Intersect", "unit": "", "value": 1, "shap_value": 0.1150, "impact": "positive"},
+                        {"feature": "frp", "label": "Fire Radiative Power (FRP)", "unit": "MW", "value": 42.1, "shap_value": -0.0950, "impact": "negative"},
+                    ],
+                    "metrics": {
+                        "frp_mw": 42.1,
+                        "brightness_temp_k": 328.4,
+                        "deviation_z_score": 0.1,
+                        "persistence_count": 48,
+                        "distance_to_nearest_facility_km": 0.0,
+                        "on_known_site": True,
+                    },
                 },
             },
             {
@@ -150,10 +183,25 @@ class DatabaseService:
                 "classified_at": now,
                 "shap_explanation": {
                     "summary": "Classified as AGRICULTURAL_BURN (91.0% confidence)",
+                    "base_value": 0.1662,
                     "primary_factors": [
                         "Located in agricultural cropland >15 km from industrial facilities.",
                         "Transient, short-duration thermal signature.",
                     ],
+                    "shap_factors": [
+                        {"feature": "land_cover_encoded", "label": "Land Cover Classification", "unit": "", "value": "farmland", "shap_value": 0.3810, "impact": "positive"},
+                        {"feature": "on_known_site", "label": "Industrial Site Intersect", "unit": "", "value": 0, "shap_value": 0.2240, "impact": "positive"},
+                        {"feature": "persistence_count", "label": "Multi-Temporal Persistence", "unit": "passes", "value": 1, "shap_value": 0.1650, "impact": "positive"},
+                        {"feature": "frp", "label": "Fire Radiative Power (FRP)", "unit": "MW", "value": 18.5, "shap_value": -0.0820, "impact": "negative"},
+                    ],
+                    "metrics": {
+                        "frp_mw": 18.5,
+                        "brightness_temp_k": 315.0,
+                        "deviation_z_score": 0.0,
+                        "persistence_count": 1,
+                        "distance_to_nearest_facility_km": 18.2,
+                        "on_known_site": False,
+                    },
                 },
             },
         ]
@@ -191,7 +239,8 @@ class DatabaseService:
                 if region:
                     query = query.eq("region", region)
                 res = query.execute()
-                if res.data and len(res.data) > 0:
+                valid_sites = [s for s in (res.data or []) if s.get("coordinates") or s.get("geom")]
+                if valid_sites:
                     return res.data
             except Exception as e:
                 logger.error(f"Error querying sites from Supabase: {e}")

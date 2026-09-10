@@ -79,7 +79,7 @@ class FeatureExtractor:
 
         data = df.copy()
 
-        # 1. Temporal feature extraction
+        # Temporal features
         if "detected_at" in data.columns:
             data["detected_at"] = pd.to_datetime(data["detected_at"], utc=True)
             data["hour_of_day"] = data["detected_at"].dt.hour
@@ -88,7 +88,7 @@ class FeatureExtractor:
             data["hour_of_day"] = data.get("hour_of_day", 12)
             data["day_of_week"] = data.get("day_of_week", 0)
 
-        # 2. Categorical encodings
+        # Categorical features
         if "confidence" not in data.columns:
             data["confidence"] = "nominal"
         data["confidence_numeric"] = (
@@ -122,7 +122,7 @@ class FeatureExtractor:
             .astype(int)
         )
 
-        # 3. Numeric defaults and bounds
+        # Numerical imputation
         data["brightness_temp"] = pd.to_numeric(data["brightness_temp"], errors="coerce").fillna(310.0)
         data["frp"] = pd.to_numeric(data["frp"], errors="coerce").fillna(5.0)
         data["on_known_site"] = pd.to_numeric(data["on_known_site"], errors="coerce").fillna(0).astype(int)
@@ -138,7 +138,6 @@ class FeatureExtractor:
             data["is_first_detection"] = 0
         data["is_first_detection"] = pd.to_numeric(data["is_first_detection"], errors="coerce").fillna(0).astype(int)
 
-        # Return strictly the ordered feature columns
         X = data[FEATURE_COLUMNS].copy()
         return X
 

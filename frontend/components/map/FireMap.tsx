@@ -12,6 +12,54 @@ interface FireMapProps {
   onSelectEvent?: (event: ClassifiedEvent) => void;
 }
 
+const DEFAULT_DEMO_SITES: IndustrialSite[] = [
+  {
+    id: "site-dahej-plant",
+    osm_id: 100102,
+    name: "Dahej Chemical Complex (Yashashvi Agro Facility)",
+    site_type: "chemical",
+    region: "dahej",
+    state: "Gujarat",
+    coordinates: [
+      [72.570, 21.700],
+      [72.595, 21.700],
+      [72.595, 21.725],
+      [72.570, 21.725],
+      [72.570, 21.700],
+    ],
+  },
+  {
+    id: "site-jamnagar",
+    osm_id: 100101,
+    name: "Reliance Jamnagar Refinery Complex",
+    site_type: "refinery",
+    region: "jamnagar",
+    state: "Gujarat",
+    coordinates: [
+      [69.83, 22.33],
+      [69.89, 22.33],
+      [69.89, 22.38],
+      [69.83, 22.38],
+      [69.83, 22.33],
+    ],
+  },
+  {
+    id: "site-hazira",
+    osm_id: 100103,
+    name: "Hazira Petrochemical Manufacturing Hub",
+    site_type: "steel",
+    region: "hazira",
+    state: "Gujarat",
+    coordinates: [
+      [72.62, 21.08],
+      [72.71, 21.08],
+      [72.71, 21.15],
+      [72.62, 21.15],
+      [72.62, 21.08],
+    ],
+  },
+];
+
 const REPLAY_TIMELINE = [
   {
     stepName: "Day T-2 (June 1, 2020)",
@@ -33,9 +81,17 @@ const REPLAY_TIMELINE = [
         site_type: "refinery",
         shap_explanation: {
           summary: "Classified as NORMAL_FLARE (99% confidence)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output 42.1 MW matches historical mean (41.5 MW).",
             "Deviation: +0.1 sigma within routine operational bounds.",
+          ],
+          shap_factors: [
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 52, shap_value: 0.384, impact: "positive" },
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "refinery", shap_value: 0.245, impact: "positive" },
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: 0.1, shap_value: 0.188, impact: "positive" },
+            { feature: "on_known_site", label: "Industrial Site Intersect", unit: "", value: 1, shap_value: 0.122, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 42.1, shap_value: -0.091, impact: "negative" },
           ],
           metrics: { frp_mw: 42.1, deviation_z_score: 0.1 },
         },
@@ -55,9 +111,16 @@ const REPLAY_TIMELINE = [
         site_type: "chemical",
         shap_explanation: {
           summary: "Classified as NORMAL_FLARE (88% confidence)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output 14.8 MW matches normal chemical plant heat trace.",
             "Deviation: -0.1 sigma below baseline.",
+          ],
+          shap_factors: [
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "chemical", shap_value: 0.265, impact: "positive" },
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 28, shap_value: 0.218, impact: "positive" },
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: -0.1, shap_value: 0.155, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 14.8, shap_value: -0.114, impact: "negative" },
           ],
           metrics: { frp_mw: 14.8, deviation_z_score: -0.1 },
         },
@@ -84,9 +147,16 @@ const REPLAY_TIMELINE = [
         site_type: "refinery",
         shap_explanation: {
           summary: "Classified as NORMAL_FLARE (99% confidence)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output 40.5 MW matches baseline.",
             "Deviation: -0.2 sigma.",
+          ],
+          shap_factors: [
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 53, shap_value: 0.392, impact: "positive" },
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "refinery", shap_value: 0.251, impact: "positive" },
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: -0.2, shap_value: 0.174, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 40.5, shap_value: -0.098, impact: "negative" },
           ],
           metrics: { frp_mw: 40.5, deviation_z_score: -0.2 },
         },
@@ -106,9 +176,16 @@ const REPLAY_TIMELINE = [
         site_type: "chemical",
         shap_explanation: {
           summary: "Classified as NORMAL_FLARE (89% confidence)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output 16.2 MW consistent with routine operations.",
             "Deviation: +0.3 sigma.",
+          ],
+          shap_factors: [
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "chemical", shap_value: 0.272, impact: "positive" },
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 29, shap_value: 0.224, impact: "positive" },
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: 0.3, shap_value: 0.162, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 16.2, shap_value: -0.108, impact: "negative" },
           ],
           metrics: { frp_mw: 16.2, deviation_z_score: 0.3 },
         },
@@ -135,9 +212,16 @@ const REPLAY_TIMELINE = [
         site_type: "refinery",
         shap_explanation: {
           summary: "Classified as NORMAL_FLARE (STAYS NORMAL)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output 43.8 MW (Normal baseline ~41.5 MW).",
             "Routine flare stays grey and classified as normal operational heat.",
+          ],
+          shap_factors: [
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 54, shap_value: 0.395, impact: "positive" },
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "refinery", shap_value: 0.248, impact: "positive" },
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: 0.4, shap_value: 0.181, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 43.8, shap_value: -0.088, impact: "negative" },
           ],
           metrics: { frp_mw: 43.8, deviation_z_score: 0.4 },
         },
@@ -157,10 +241,18 @@ const REPLAY_TIMELINE = [
         site_type: "chemical",
         shap_explanation: {
           summary: "EMERGENCY: INDUSTRIAL_FIRE DETECTED (+5.8 sigma spike)",
+          base_value: 0.1662,
           primary_factors: [
             "Thermal output surged to 188.4 MW (12.5x above baseline mean of 15.0 MW).",
             "Statistical deviation exceeds +5.8 sigma, triggering immediate critical alert.",
             "Direct spatial intersection with Dahej chemical industrial polygon.",
+          ],
+          shap_factors: [
+            { feature: "deviation_score", label: "Baseline Deviation", unit: "sigma", value: 5.8, shap_value: 0.342, impact: "positive" },
+            { feature: "frp", label: "Fire Radiative Power (FRP)", unit: "MW", value: 188.4, shap_value: 0.298, impact: "positive" },
+            { feature: "on_known_site", label: "Industrial Site Intersect", unit: "", value: 1, shap_value: 0.145, impact: "positive" },
+            { feature: "site_type_encoded", label: "Site Facility Type", unit: "", value: "chemical", shap_value: 0.092, impact: "positive" },
+            { feature: "persistence_count", label: "Multi-Temporal Persistence", unit: "passes", value: 30, shap_value: -0.045, impact: "negative" },
           ],
           metrics: { frp_mw: 188.4, deviation_z_score: 5.8 },
         },
@@ -281,20 +373,27 @@ export const FireMap: React.FC<FireMapProps> = ({
 
     polygonsLayerRef.current.clearLayers();
 
-    sites.forEach((site) => {
+    const validSites = (sites || []).filter((s) => s.coordinates && s.coordinates.length >= 3);
+    const sitesToRender = validSites.length > 0 ? validSites : DEFAULT_DEMO_SITES;
+
+    sitesToRender.forEach((site) => {
       if (site.coordinates && site.coordinates.length >= 3) {
         const latLngs = site.coordinates.map((pt) => [pt[1], pt[0]]);
         const polygon = L.polygon(latLngs, {
-          color: "#38bdf8",
-          weight: 1.5,
-          opacity: 0.7,
-          fillColor: "#0284c7",
-          fillOpacity: 0.12,
+          color: "#0284c7",
+          weight: 2.5,
+          opacity: 0.95,
+          fillColor: "#38bdf8",
+          fillOpacity: 0.20,
+          dashArray: "6, 4",
         });
 
         polygon.bindTooltip(
-          `<strong>${site.name}</strong><br/><span style="color:#94a3b8;font-size:10px;">${site.site_type.toUpperCase()}</span>`,
-          { className: "bg-surface text-slate-100 border border-slate-700 px-2 py-1 rounded" }
+          `<div style="font-family:sans-serif; padding:2px;">
+             <strong style="color:#0284c7; font-size:11px;">${site.name}</strong><br/>
+             <span style="color:#64748b; font-size:10px; font-family:monospace;">OSM INDUSTRIAL BOUNDARY (${site.site_type.toUpperCase()})</span>
+           </div>`,
+          { className: "bg-white text-slate-800 border border-slate-300 shadow-md px-2.5 py-1.5 rounded-lg" }
         );
 
         polygon.addTo(polygonsLayerRef.current);

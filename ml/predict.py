@@ -82,11 +82,18 @@ class ClassifierService:
 
         severities: List[str] = []
         is_anomalies: List[bool] = []
-        explanations: List[Dict[str, Any]] = []
+        explanations = ExplainabilityEngine.batch_generate_explanations(
+            model=self.model,
+            X=X,
+            df=df,
+            predicted_labels=predicted_labels,
+            pred_indices=pred_indices,
+            confidences=confidences,
+            class_names=self.encoder.classes_.tolist(),
+        )
 
         for idx, (_, row) in enumerate(df.iterrows()):
             label = predicted_labels[idx]
-            conf = float(confidences[idx])
 
             # Determine severity
             if label == "industrial_fire":
@@ -99,15 +106,8 @@ class ClassifierService:
                 severity = "info"
                 is_anomaly = False
 
-            explanation = ExplainabilityEngine.generate_explanation(
-                row=row.to_dict(),
-                predicted_label=label,
-                confidence=conf,
-            )
-
             severities.append(severity)
             is_anomalies.append(is_anomaly)
-            explanations.append(explanation)
 
         df["label"] = predicted_labels
         df["confidence"] = [round(float(c), 4) for c in confidences]

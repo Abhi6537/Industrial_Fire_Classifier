@@ -130,15 +130,8 @@ python scripts/replay_incident.py
 
 ---
 
-## What to Say to Judges (Guiding Principles)
+## Operational Considerations & Remote Sensing Constraints
 
-- **Always Say**:
-  - *"We classify fires based on deviation from historical per-site baseline, NOT raw temperature alone — because raw temperatures of gas flares and explosions overlap heavily."*
-  - *"The stack is architected to run on 100% free-tier infrastructure (NASA FIRMS, Supabase PostGIS, Render, Vercel)."*
-  - *"We validated against the documented June 3, 2020 Dahej chemical disaster, proving routine flares stay normal while emergencies are isolated."*
-- **Never Say**:
-  - *"Our AI detects fires in real time"* (NASA FIRMS satellite overpass has a ~3-hour orbital latency; be technically honest).
-  - *"The model learns continuously"* (It retrains on an audited batch schedule, not autonomously).
-
-
-python scripts/run_ingestion.py
+- **Satellite Latency**: NASA FIRMS NRT data is delivered with an average orbital latency of 2.5 to 3 hours between satellite overpass and ground station telemetry processing.
+- **Atmospheric Attenuation**: Thick aerosol plumes from massive fires can attenuate apparent 375m I-band brightness temperature by 10–15%; the feature pipeline accounts for dual-band VIIRS brightness differences ($T_{4} - T_{5}$).
+- **Batch Retraining**: Models are retrained via scheduled offline pipelines against verified ground-truth registries rather than unverified continuous online updates.

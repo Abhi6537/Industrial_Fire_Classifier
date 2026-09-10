@@ -102,12 +102,71 @@ export const ExplanationPanel: React.FC<ExplanationPanelProps> = ({
       </div>
 
       {/* Explainability / SHAP Decision Factors */}
-      <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 font-sans">
-          <Cpu className="w-3.5 h-3.5 text-blue-600" />
-          <span>Inference Drivers (SHAP Tree Attribution)</span>
+      <div className="flex flex-col gap-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-800 font-sans">
+            <Cpu className="w-3.5 h-3.5 text-blue-600" />
+            <span>SHAP Attribution Breakdown (&phi;<sub>i</sub>)</span>
+          </div>
+          {event.shap_explanation?.base_value !== undefined && (
+            <span className="text-[10px] font-mono text-slate-500">
+              E[f(x)]: <strong>{(event.shap_explanation.base_value * 100).toFixed(1)}%</strong>
+            </span>
+          )}
         </div>
+
+        {/* Visual Diverging SHAP Bar Chart */}
+        {event.shap_explanation?.shap_factors && event.shap_explanation.shap_factors.length > 0 ? (
+          <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col gap-2">
+            <div className="flex justify-between items-center text-[10px] font-mono text-slate-400 border-b border-slate-200 pb-1">
+              <span>FEATURE & VALUE</span>
+              <span>ATTRIBUTION (&phi;)</span>
+            </div>
+            {event.shap_explanation.shap_factors.slice(0, 5).map((f, idx) => {
+              const isPos = f.shap_value >= 0;
+              const maxVal = Math.max(...(event.shap_explanation?.shap_factors?.map(x => Math.abs(x.shap_value)) || [0.5]), 0.4);
+              const barWidthPct = Math.min(Math.round((Math.abs(f.shap_value) / maxVal) * 100), 100);
+
+              return (
+                <div key={idx} className="flex flex-col gap-0.5 text-xs">
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-slate-700 font-medium truncate max-w-[210px]">
+                      {f.label}
+                      <span className="text-slate-400 font-mono text-[10px] ml-1">
+                        ({f.value}{f.unit ? ` ${f.unit}` : ""})
+                      </span>
+                    </span>
+                    <span
+                      className={`font-mono text-[11px] font-bold ${
+                        isPos ? "text-red-600" : "text-blue-600"
+                      }`}
+                    >
+                      {isPos ? `+${f.shap_value.toFixed(3)}` : f.shap_value.toFixed(3)}
+                    </span>
+                  </div>
+                  {/* Diverging Bar */}
+                  <div className="w-full bg-slate-200/80 h-1.5 rounded-full overflow-hidden flex">
+                    {isPos ? (
+                      <div
+                        className="h-full bg-gradient-to-r from-amber-500 to-red-500 rounded-full transition-all duration-300"
+                        style={{ width: `${barWidthPct}%` }}
+                      />
+                    ) : (
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-400 to-indigo-600 rounded-full transition-all duration-300"
+                        style={{ width: `${barWidthPct}%` }}
+                      />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        ) : null}
+
+        {/* Operational Intelligence Synthesis Bullets */}
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-xs text-slate-700 flex flex-col gap-2">
+          <div className="text-[10px] uppercase font-mono font-semibold text-slate-400">Operational Synthesis</div>
           {event.shap_explanation?.primary_factors?.map((reason, idx) => (
             <div key={idx} className="flex items-start gap-2 text-[11px] leading-relaxed">
               <ChevronRight className="w-3.5 h-3.5 text-blue-600 shrink-0 mt-0.5" />

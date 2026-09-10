@@ -1,13 +1,6 @@
 """
-Training Dataset Generator (Honest Weak-Labeling Engine)
-Builds the benchmark training dataset for the 6-class fire classification model.
-Implements domain-grounded weak labeling rules:
-- industrial_fire: Known industrial fire incidents (NISSMAT + news verification), sudden FRP spike, high Z-score
-- normal_flare: VIIRS Nightfire inventory, high persistence (20+ nights), low deviation
-- wildfire: Dense forest land cover, distant from industry (>5km), multi-point spread
-- agricultural_burn: Farmland, short persistence (<3 passes), moderate FRP
-- mining_activity: Mining OSM polygons, persistent low-moderate FRP
-- unregistered_anomaly: Built-up/industrial land-cover not mapped to any known OSM facility
+Synthetic and weak-labeled benchmark dataset generator for 6-class fire classification.
+Simulates satellite thermal anomaly patterns across industrial, agricultural, and natural environments.
 """
 
 import os
@@ -172,14 +165,7 @@ def generate_benchmark_dataset(samples_per_class: int = 250, seed: int = 42) -> 
 
     df = pd.DataFrame(records)
 
-    # -------------------------------------------------------------------------
-    # REALISTIC SATELLITE SENSOR & SPATIAL NOISE INJECTION (VIIRS Operations)
-    # -------------------------------------------------------------------------
-    # In real satellite operations, 100% accuracy is an anti-pattern. Real challenges:
-    # 1. Thick smoke absorbs IR: apparent FRP drops ~35-50% for some industrial fires.
-    # 2. Flare maintenance venting: flare stack jumps to Z-score 2.2-3.1 temporarily.
-    # 3. Fence-line stubble burning: agricultural fires within 300m-700m of industrial boundaries.
-    # 4. Small unmapped workshops in semi-rural fringe with low thermal output.
+    # Sensor noise and atmospheric attenuation modeling
     noise_indices = df.sample(frac=0.16, random_state=seed).index
     for idx in noise_indices:
         noise_type = random.choice([
