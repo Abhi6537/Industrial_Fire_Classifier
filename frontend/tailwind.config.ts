@@ -5,6 +5,9 @@ const config: Config = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./lib/**/*.{js,ts,jsx,tsx,mdx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "app/**/*.{js,ts,jsx,tsx,mdx}",
+    "components/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   darkMode: "class",
   theme: {
@@ -41,6 +44,8 @@ const config: Config = {
         float:        "float 4s ease-in-out infinite",
         "pulse-ring": "pulseRing 2.5s ease-out infinite",
         "fade-up":    "fadeUp 0.6s ease-out both",
+        "hero-pan":   "heroPan 25s ease-in-out infinite alternate",
+        "beam-scan":  "beamScan 4s ease-in-out infinite",
       },
       keyframes: {
         float: {
@@ -54,6 +59,16 @@ const config: Config = {
         fadeUp: {
           "0%":   { opacity: "0", transform: "translateY(16px)" },
           "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+        heroPan: {
+          "0%":   { transform: "scale(1) translate(0px, 0px)" },
+          "50%":  { transform: "scale(1.08) translate(-15px, -10px)" },
+          "100%": { transform: "scale(1.04) translate(10px, -15px)" },
+        },
+        beamScan: {
+          "0%":   { opacity: "0.3", transform: "scale(0.98)" },
+          "50%":  { opacity: "0.85", transform: "scale(1.03)" },
+          "100%": { opacity: "0.3", transform: "scale(0.98)" },
         },
       },
     },
