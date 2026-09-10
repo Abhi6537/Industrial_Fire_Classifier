@@ -97,7 +97,7 @@ def run_live_evaluation():
 
     # 7. Key Defense Audit Conclusion
     print("\n" + "=" * 78)
-    print("  KEY PROOF POINTS FOR NTRO & SIH 2026 JURY:")
+    print("  KEY PROOF POINTS FOR NTRO EVALUATION JURY:")
     print("  1. Industrial Fire Recall = 100.0%: ZERO real industrial emergencies are missed.")
     print("  2. Normal Flare Precision = 100.0%: ZERO routine refinery flares trigger false alarms.")
     print("  3. Mathematical Separation: The Z-Score baseline feature completely prevents")

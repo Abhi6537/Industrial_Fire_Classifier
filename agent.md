@@ -1,5 +1,5 @@
 # AGENT.md — Industrial Fire Detection & Classification System
-# Smart India Hackathon 2026 | NTRO Problem Statement
+# NTRO Problem Statement
 
 ---
 

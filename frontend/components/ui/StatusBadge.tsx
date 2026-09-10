@@ -7,65 +7,61 @@ const STATUS_CONFIG: Record<
 > = {
   open: {
     label: "Open",
-    bg: "rgba(220,38,38,0.12)",
-    color: "#ef4444",
-    border: "rgba(220,38,38,0.3)",
+    bg: "rgba(229, 115, 115, 0.12)",
+    color: "#e57373",
+    border: "rgba(229, 115, 115, 0.25)",
   },
   monitoring: {
     label: "Monitoring",
-    bg: "rgba(13,148,136,0.12)",
-    color: "#14b8a6",
-    border: "rgba(13,148,136,0.3)",
+    bg: "rgba(100, 181, 246, 0.12)",
+    color: "#64b5f6",
+    border: "rgba(100, 181, 246, 0.25)",
   },
   investigating: {
     label: "Investigating",
-    bg: "rgba(202,138,4,0.12)",
-    color: "#eab308",
-    border: "rgba(202,138,4,0.3)",
+    bg: "rgba(255, 183, 77, 0.12)",
+    color: "#ffb74d",
+    border: "rgba(255, 183, 77, 0.25)",
   },
   closed: {
     label: "Closed",
-    bg: "rgba(75,85,99,0.12)",
-    color: "#9ca3af",
-    border: "rgba(75,85,99,0.3)",
+    bg: "rgba(144, 164, 174, 0.12)",
+    color: "#90a4ae",
+    border: "rgba(144, 164, 174, 0.25)",
   },
   Operational: {
     label: "Operational",
-    bg: "rgba(34,197,94,0.12)",
-    color: "#22c55e",
-    border: "rgba(34,197,94,0.3)",
+    bg: "rgba(129, 199, 132, 0.12)",
+    color: "#81c784",
+    border: "rgba(129, 199, 132, 0.25)",
   },
   Maintenance: {
     label: "Maintenance",
-    bg: "rgba(217,119,6,0.12)",
-    color: "#f59e0b",
-    border: "rgba(217,119,6,0.3)",
+    bg: "rgba(255, 183, 77, 0.12)",
+    color: "#ffb74d",
+    border: "rgba(255, 183, 77, 0.25)",
   },
   Offline: {
     label: "Offline",
-    bg: "rgba(75,85,99,0.12)",
-    color: "#9ca3af",
-    border: "rgba(75,85,99,0.3)",
+    bg: "rgba(144, 164, 174, 0.12)",
+    color: "#90a4ae",
+    border: "rgba(144, 164, 174, 0.25)",
   },
 };
 
 export function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_CONFIG[status as keyof typeof STATUS_CONFIG] || {
     label: status,
-    bg: "rgba(75,85,99,0.12)",
-    color: "#9ca3af",
-    border: "rgba(75,85,99,0.3)",
+    bg: "rgba(144, 164, 174, 0.12)",
+    color: "#90a4ae",
+    border: "rgba(144, 164, 174, 0.25)",
   };
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded text-[11px] font-semibold"
+      className="inline-flex items-center justify-center px-3 py-1 rounded-full text-[11px] font-medium"
       style={{ background: cfg.bg, color: cfg.color, border: `1px solid ${cfg.border}` }}
     >
-      <span
-        className="w-1.5 h-1.5 rounded-full"
-        style={{ background: cfg.color }}
-      />
       {cfg.label}
     </span>
   );

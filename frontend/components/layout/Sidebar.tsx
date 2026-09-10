@@ -4,76 +4,55 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  Flame,
   LayoutDashboard,
   Bell,
   Building2,
   BarChart3,
-  Settings,
+  History,
 } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Alerts",    href: "/alerts",    icon: Bell },
-  { label: "Sites",     href: "/site/fac_001", icon: Building2 },
-  { label: "Analytics", href: "/dashboard", icon: BarChart3 },
+  { key: "dashboard",  label: "Dashboard",       href: "/dashboard",      icon: LayoutDashboard },
+  { key: "alerts",     label: "Alerts",          href: "/alerts",         icon: Bell },
+  { key: "sites",      label: "Sites",           href: "/site/fac_001",   icon: Building2 },
+  { key: "analytics",  label: "Analytics",       href: "/analytics",      icon: BarChart3 },
+  { key: "historical", label: "Historical Data", href: "/dashboard/audit", icon: History },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-tw-surface border-r border-tw-border flex flex-col flex-shrink-0 min-h-screen">
-      {/* Brand */}
-      <div className="p-5 border-b border-tw-border flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-tw-orange/15 border border-tw-orange/30 flex items-center justify-center flex-shrink-0">
-          <Flame className="w-4.5 h-4.5 text-tw-orange fill-tw-orange/20" />
-        </div>
-        <div className="flex flex-col">
-          <span className="text-tw-text font-bold text-sm tracking-tight">
-            ThermoWatch
-          </span>
-          <span className="text-tw-muted text-[10px]">
-            From Space to a Safer Tomorrow
-          </span>
-        </div>
-      </div>
-
-      {/* Primary Navigation */}
-      <nav className="p-3 flex-1 flex flex-col gap-1">
+    <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[99999] pointer-events-auto">
+      <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-[#1c1f1b]/95 backdrop-blur-xl border border-white/20 shadow-2xl shadow-black/90 transition-all duration-300 hover:border-white/30">
         {NAV_ITEMS.map((item) => {
           const Icon = item.icon;
-          const isActive =
-            pathname === item.href ||
-            (item.href.startsWith("/site") && pathname.startsWith("/site"));
+
+          const isActive = (() => {
+            if (item.key === "dashboard") return pathname === "/dashboard";
+            if (item.key === "alerts") return pathname === "/alerts" || pathname === "/dashboard/alerts";
+            if (item.key === "sites") return pathname.startsWith("/site");
+            if (item.key === "analytics") return pathname === "/analytics";
+            if (item.key === "historical") return pathname === "/dashboard/audit";
+            return false;
+          })();
 
           return (
             <Link
-              key={item.label}
+              key={item.key}
               href={item.href}
-              className={`flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold transition-all ${
+              className={`relative px-4 py-2.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-200 flex items-center gap-2 select-none ${
                 isActive
-                  ? "bg-tw-teal/15 text-tw-teal border border-tw-teal/30"
-                  : "text-tw-muted hover:text-tw-text hover:bg-tw-raised border border-transparent"
+                  ? "bg-white/15 border border-white/25 text-white font-bold shadow-[0_0_14px_rgba(255,255,255,0.18)]"
+                  : "text-tw-muted hover:text-white hover:bg-white/5 border border-transparent"
               }`}
             >
-              <Icon className="w-4 h-4 flex-shrink-0" />
-              {item.label}
+              <Icon className={`w-4 h-4 flex-shrink-0 ${isActive ? "text-white" : "text-tw-muted"}`} />
+              <span>{item.label}</span>
             </Link>
           );
         })}
-      </nav>
-
-      {/* Settings at bottom */}
-      <div className="p-3 border-t border-tw-border">
-        <Link
-          href="#"
-          className="flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-xs font-semibold text-tw-muted hover:text-tw-text hover:bg-tw-raised transition-all"
-        >
-          <Settings className="w-4 h-4 flex-shrink-0" />
-          Settings
-        </Link>
       </div>
-    </aside>
+    </nav>
   );
 }

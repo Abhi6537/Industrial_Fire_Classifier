@@ -1,5 +1,5 @@
 # NTRO Industrial Fire Detection & Classification System
-**Smart India Hackathon 2026 | National Technical Research Organisation (NTRO)**
+**National Technical Research Organisation (NTRO)**
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.110+-009688.svg)](https://fastapi.tiangolo.com)
@@ -108,7 +108,7 @@ npm run dev
 
 ## Verification & Historical Proof Point
 
-To demonstrate the system live to NTRO / SIH judges, execute the historical replay script:
+To demonstrate the system live to NTRO evaluation judges, execute the historical replay script:
 
 ```bash
 python scripts/replay_incident.py
