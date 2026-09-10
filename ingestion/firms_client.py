@@ -14,6 +14,8 @@ import requests
 import pandas as pd
 from dotenv import load_dotenv
 
+from ingestion.india_boundary import india_engine
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -21,13 +23,15 @@ logger = logging.getLogger("firms_client")
 
 # NASA FIRMS API Constants
 DEFAULT_FIRMS_BASE_URL = "https://firms.modaps.eosdis.nasa.gov/api/area/csv"
-DEFAULT_SOURCE = "VIIRS_SNPP_NRT"  # Suomi NPP 375m resolution (high spatial fidelity)
+DEFAULT_SOURCE = "ALL_VIIRS"  # Multi-constellation: Suomi-NPP + NOAA-20 + NOAA-21
+ALL_VIIRS_SOURCES = ["VIIRS_SNPP_NRT", "VIIRS_NOAA20_NRT", "VIIRS_NOAA21_NRT"]
 
 
 class FIRMSClient:
     """
     Client for querying the NASA FIRMS Area API.
     Produces standardized pandas DataFrames matching the 'detections' database table.
+    Supports multi-constellation concurrent satellite observation aggregation.
     """
 
     def __init__(self, map_key: Optional[str] = None, base_url: str = DEFAULT_FIRMS_BASE_URL):
@@ -48,16 +52,18 @@ class FIRMSClient:
     ) -> pd.DataFrame:
         """
         Pulls thermal anomaly detections within the bounding box for the specified past day_range.
+        Queries all operational VIIRS constellation satellites (Suomi-NPP, NOAA-20, NOAA-21)
+        to ensure zero orbital blind-spots and full temporal coverage.
         
         Args:
-            bbox: Bounding box formatted as 'west,south,east,north' (e.g. '68.0,20.0,78.0,26.0')
-            source: Satellite instrument source (e.g. 'VIIRS_SNPP_NRT', 'VIIRS_NOAA20_NRT')
+            bbox: Bounding box formatted as 'west,south,east,north' (e.g. '68.0,6.5,97.5,37.5')
+            source: Satellite instrument source ('ALL_VIIRS', or specific like 'VIIRS_SNPP_NRT')
             day_range: Number of days to look back (1-10)
 
         Returns:
             pd.DataFrame: Cleaned detections conforming to the detections schema
         """
-        target_bbox = bbox or os.getenv("TARGET_BBOX", "68.0,20.0,78.0,26.0")
+        target_bbox = bbox or os.getenv("TARGET_BBOX", "68.0,6.5,97.5,37.5")
 
         if not self.is_configured():
             logger.warning(
@@ -67,28 +73,41 @@ class FIRMSClient:
             )
             return self.get_offline_sample(target_bbox)
 
-        # NASA FIRMS Area API URL format:
-        # https://firms.modaps.eosdis.nasa.gov/api/area/csv/[MAP_KEY]/[SOURCE]/[EXTENT]/[DAY_RANGE]
-        url = f"{self.base_url}/{self.map_key}/{source}/{target_bbox}/{day_range}"
-        logger.info(f"Querying NASA FIRMS API for region [{target_bbox}], source [{source}], days [{day_range}]...")
+        active_sources = ALL_VIIRS_SOURCES if source in ("ALL_VIIRS", "ALL", None) else [source]
+        all_records_df_list = []
 
-        try:
-            response = requests.get(url, timeout=30)
-            response.raise_for_status()
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Failed to fetch data from FIRMS API: {e}")
-            raise
+        for src in active_sources:
+            url = f"{self.base_url}/{self.map_key}/{src}/{target_bbox}/{day_range}"
+            logger.info(f"Querying NASA FIRMS API for region [{target_bbox}], source [{src}], days [{day_range}]...")
 
-        csv_text = response.text.strip()
-        if not csv_text or "latitude" not in csv_text.lower():
-            if "invalid map key" in csv_text.lower() or "bad request" in csv_text.lower():
-                logger.error(f"FIRMS API Error Response: {csv_text}")
-                raise ValueError(f"NASA FIRMS API rejected the request: {csv_text}")
+            try:
+                response = requests.get(url, timeout=30)
+                if response.status_code != 200:
+                    logger.warning(f"FIRMS source {src} returned HTTP {response.status_code}")
+                    continue
+
+                csv_text = response.text.strip()
+                if not csv_text or "latitude" not in csv_text.lower():
+                    if "invalid map key" in csv_text.lower() or "bad request" in csv_text.lower():
+                        logger.error(f"FIRMS API Error Response: {csv_text}")
+                    continue
+
+                raw_df = pd.read_csv(io.StringIO(csv_text))
+                norm_df = self.normalize_firms_data(raw_df, src)
+                if not norm_df.empty:
+                    all_records_df_list.append(norm_df)
+            except Exception as e:
+                logger.error(f"Failed to fetch data from FIRMS API for {src}: {e}")
+                continue
+
+        if not all_records_df_list:
             logger.info("No active thermal anomalies detected in the specified area.")
             return pd.DataFrame()
 
-        raw_df = pd.read_csv(io.StringIO(csv_text))
-        return self.normalize_firms_data(raw_df, source)
+        merged_df = pd.concat(all_records_df_list, ignore_index=True)
+        merged_df.drop_duplicates(subset=["latitude", "longitude", "detected_at"], inplace=True)
+        logger.info(f"Aggregated {len(merged_df)} deduplicated sovereign Indian hotspots across {len(active_sources)} satellite instruments.")
+        return merged_df
 
     def normalize_firms_data(self, df: pd.DataFrame, source: str) -> pd.DataFrame:
         """
@@ -104,6 +123,10 @@ class FIRMSClient:
             try:
                 lat = float(row.get("latitude", 0.0))
                 lon = float(row.get("longitude", 0.0))
+
+                # Strict Sovereign Territorial Filter: Exclude foreign detections (Sri Lanka, Pakistan, Bangladesh, Nepal, ocean)
+                if not india_engine.is_in_india(lat, lon):
+                    continue
 
                 # Handle brightness temperature column variations across instruments
                 # VIIRS uses bright_ti4 (375m I-band) and bright_ti5 (thermal)

@@ -5,7 +5,7 @@ Connects to Supabase PostGIS with local fallback data stores.
 
 import os
 import logging
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from typing import List, Dict, Any, Optional
 from uuid import uuid4
 
@@ -15,6 +15,7 @@ from ingestion.land_cover import LandCoverService
 from ingestion.sentinel_imagery import SentinelImageryService
 from ingestion.cusum_detector import cusum_engine
 from ingestion.context_intelligence import context_engine
+from ingestion.india_boundary import india_engine
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("api_database")
@@ -353,7 +354,7 @@ class DatabaseService:
             try:
                 query = self.client.table("classified_events").select(
                     "*, detections(latitude, longitude, frp, brightness_temp, detected_at), sites(name, site_type)"
-                ).order("classified_at", desc=True).limit(limit)
+                ).order("classified_at", desc=True).limit(1000)
                 if label:
                     query = query.eq("label", label)
                 if severity:
@@ -362,14 +363,53 @@ class DatabaseService:
                     query = query.eq("is_anomaly", is_anomaly)
                 res = query.execute()
 
+                raw_rows = res.data or []
+
+                # Active 24-Hour FIRMS Observation Window Cutoff
+                # Ensures only live, active hotspots from the latest satellite cycle are displayed (matching NASA FIRMS "FIRES: 1 DAY")
+                cutoff_dt = None
+                all_dates = []
+                for r in raw_rows:
+                    d_str = (r.get("detections") or {}).get("detected_at") or r.get("detected_at")
+                    if d_str:
+                        try:
+                            all_dates.append(datetime.fromisoformat(d_str.replace("Z", "+00:00")))
+                        except Exception:
+                            pass
+                if all_dates:
+                    cutoff_dt = max(all_dates) - timedelta(hours=24)
+
+                seen_detection_ids = set()
                 events = []
-                for ev in (res.data or []):
+                for ev in raw_rows:
                     det = ev.get("detections") or {}
                     site = ev.get("sites") or {}
                     metrics = (ev.get("shap_explanation") or {}).get("metrics") or {}
 
+                    # Deduplicate by detection_id so repeated ingestion runs never duplicate map pins
+                    det_id = ev.get("detection_id")
+                    if det_id:
+                        if det_id in seen_detection_ids:
+                            continue
+                        seen_detection_ids.add(det_id)
+
+                    # Filter to active 24-hour observation window (drop expired days-old data)
+                    det_at_str = det.get("detected_at") or ev.get("detected_at") or ev.get("classified_at")
+                    if cutoff_dt and det_at_str:
+                        try:
+                            d_time = datetime.fromisoformat(det_at_str.replace("Z", "+00:00"))
+                            if d_time < cutoff_dt:
+                                continue
+                        except Exception:
+                            pass
+
                     lat = det.get("latitude") or ev.get("latitude") or metrics.get("latitude", 0.0)
                     lon = det.get("longitude") or ev.get("longitude") or metrics.get("longitude", 0.0)
+
+                    # Strict Territorial Boundary Filter: Only sovereign Indian territory
+                    # Automatically excludes Sri Lanka, Pakistan, Bangladesh, Nepal, and offshore international waters
+                    if not india_engine.is_in_india(float(lat), float(lon)):
+                        continue
                     
                     # Descriptive location name
                     if site.get("name") and site.get("name") != "None":
@@ -471,7 +511,7 @@ class DatabaseService:
                     events.append(ev)
 
                 if len(events) > 0:
-                    return events
+                    return events[:limit] if (limit and limit < len(events)) else events
             except Exception as e:
                 logger.error(f"Error querying events from Supabase: {e}")
 
