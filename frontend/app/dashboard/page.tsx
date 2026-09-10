@@ -238,8 +238,8 @@ export default function DashboardPage() {
                 </span>
               </div>
             </div>
-            {/* Floating Filter Toggle Button (Positioned below Leaflet Map View switcher) */}
-            <div className="absolute top-[60px] right-[10px] z-[9000] flex items-center gap-2">
+            {/* Floating Filter Toggle Button (Positioned below expanded Leaflet Map View switcher) */}
+            <div className="absolute top-[152px] right-[10px] z-[9000] flex items-center gap-2">
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 flex items-center gap-2 shadow-xl backdrop-blur-xl border ${
@@ -269,7 +269,7 @@ export default function DashboardPage() {
 
             {/* Collapsible Overlay Filter Drawer */}
             {showFilters && (
-              <div className="absolute top-[112px] right-[10px] z-[9000] w-80 bg-[#1c1f1b]/95 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-2xl p-5 space-y-5 animate-fade-up">
+              <div className="absolute top-[200px] right-[10px] z-[9000] w-80 bg-[#1c1f1b]/95 backdrop-blur-2xl border border-white/20 shadow-2xl rounded-2xl p-5 space-y-5 animate-fade-up">
                 {/* Header */}
                 <div className="flex items-center justify-between pb-3 border-b border-tw-border">
                   <div className="flex items-center gap-2">

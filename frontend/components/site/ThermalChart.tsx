@@ -3,11 +3,22 @@
 import React from "react";
 
 interface ThermalChartProps {
-  data: { date: string; radiance: number; baseline: number }[];
+  data?: { date: string; radiance: number; baseline: number }[];
 }
 
-export function ThermalChart({ data }: ThermalChartProps) {
-  if (!data || data.length === 0) return null;
+const DEFAULT_MOCK_DATA = [
+  { date: "01 Sep", radiance: 42, baseline: 40 },
+  { date: "02 Sep", radiance: 45, baseline: 41 },
+  { date: "03 Sep", radiance: 39, baseline: 40 },
+  { date: "04 Sep", radiance: 140, baseline: 42 },
+  { date: "05 Sep", radiance: 175, baseline: 41 },
+  { date: "06 Sep", radiance: 85, baseline: 43 },
+  { date: "07 Sep", radiance: 44, baseline: 41 },
+];
+
+export function ThermalChart({ data = DEFAULT_MOCK_DATA }: ThermalChartProps) {
+  const chartData = data && data.length > 0 ? data : DEFAULT_MOCK_DATA;
+
 
   const width = 600;
   const height = 180;
@@ -15,14 +26,14 @@ export function ThermalChart({ data }: ThermalChartProps) {
 
   const maxVal = 200;
 
-  const pointsRadiance = data.map((d, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - padding * 2);
+  const pointsRadiance = chartData.map((d, i) => {
+    const x = padding + (i / (chartData.length - 1)) * (width - padding * 2);
     const y = height - padding - (d.radiance / maxVal) * (height - padding * 2);
     return { x, y, val: d.radiance, date: d.date };
   });
 
-  const pointsBaseline = data.map((d, i) => {
-    const x = padding + (i / (data.length - 1)) * (width - padding * 2);
+  const pointsBaseline = chartData.map((d, i) => {
+    const x = padding + (i / (chartData.length - 1)) * (width - padding * 2);
     const y = height - padding - (d.baseline / maxVal) * (height - padding * 2);
     return { x, y };
   });

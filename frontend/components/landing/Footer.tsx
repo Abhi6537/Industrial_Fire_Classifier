@@ -1,94 +1,63 @@
 import React from "react";
-import Link from "next/link";
+import { ExternalLink } from "lucide-react";
+
+const DATA_SOURCES = [
+  {
+    name: "NASA FIRMS Telemetry",
+    desc: "MODIS & VIIRS Thermal Anomaly Feeds",
+    url: "https://firms.modaps.eosdis.nasa.gov/",
+  },
+  {
+    name: "OpenStreetMap GIS",
+    desc: "Industrial Infrastructure Boundaries",
+    url: "https://www.openstreetmap.org/",
+  },
+  {
+    name: "ESA WorldCover",
+    desc: "10m Global Land Cover Classification",
+    url: "https://esa-worldcover.org/",
+  },
+  {
+    name: "Copernicus Sentinel",
+    desc: "Multispectral Thermal Observation",
+    url: "https://sentinels.copernicus.eu/",
+  },
+];
 
 export function Footer() {
   return (
-    <footer className="border-t border-tw-border bg-tw-surface/60 backdrop-blur-md">
-      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Info Column */}
-          <div className="md:col-span-2 space-y-4">
-            <p className="text-tw-muted text-xs leading-relaxed max-w-md">
-              AI-Based Detection and Classification of Industrial Fires and Persistent Thermal Sources using NASA FIRMS, OpenStreetMap & satellite data.
-            </p>
-          </div>
-
-          {/* Quick Navigation */}
-          <div className="space-y-3">
-            <p className="text-tw-text text-xs font-bold uppercase tracking-wider">
-              Navigation
-            </p>
-            <ul className="space-y-2 text-xs">
-              {[
-                ["Home", "#home"],
-                ["Solution", "#solution"],
-                ["Impact", "#impact"],
-                ["About", "#about"],
-                ["Dashboard", "/dashboard"],
-                ["Alerts", "/alerts"],
-              ].map(([label, href]) => (
-                <li key={label}>
-                  <Link
-                    href={href}
-                    className="text-tw-muted hover:text-tw-text transition-colors"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Data Sources */}
-          <div className="space-y-3">
-            <p className="text-tw-text text-xs font-bold uppercase tracking-wider">
-              Data Sources & Standards
-            </p>
-            <ul className="space-y-2 text-xs">
-              {[
-                "NASA FIRMS / VIIRS Thermal",
-                "OpenStreetMap Infrastructure",
-                "ESA WorldCover Land Use",
-                "Satellite Thermal Radiance",
-              ].map((item) => (
-                <li key={item} className="text-tw-muted flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-tw-teal/60" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
+    <footer className="border-t border-[#2f352e]/60 bg-[#141714] py-14 px-6">
+      <div className="max-w-6xl mx-auto space-y-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <p className="text-xs font-mono uppercase tracking-widest text-[#60675b] font-semibold">
+            Data Sources &amp; Standards
+          </p>
+          <span className="text-xs font-mono text-[#60675b]">
+            ThermoWatch Intelligence Platform
+          </span>
         </div>
 
-        {/* Bottom Bar */}
-        <div className="border-t border-tw-border/60 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-tw-dim">
-          <p>© 2024 Industrial Thermal Intelligence Platform</p>
-          <div className="flex items-center gap-6">
+        {/* Clean borderless data sources letting text breathe naturally */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {DATA_SOURCES.map((source) => (
             <a
-              href="https://github.com"
+              key={source.name}
+              href={source.url}
               target="_blank"
-              rel="noreferrer"
-              className="hover:text-tw-text transition-colors"
+              rel="noopener noreferrer"
+              className="group space-y-1.5 transition-colors"
             >
-              GitHub
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-semibold text-[#e8e4d9] group-hover:text-[#c05621] transition-colors">
+                  {source.name}
+                </span>
+                <ExternalLink className="w-3 h-3 text-[#60675b] group-hover:text-[#e8e4d9] transition-colors" />
+              </div>
+              <p className="text-xs text-[#98a092] leading-relaxed">
+                {source.desc}
+              </p>
             </a>
-            <a
-              href="https://linkedin.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-tw-text transition-colors"
-            >
-              LinkedIn
-            </a>
-            <a
-              href="https://x.com"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-tw-text transition-colors"
-            >
-              X / Twitter
-            </a>
-          </div>
+          ))}
         </div>
       </div>
     </footer>
