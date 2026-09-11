@@ -197,6 +197,7 @@ export function ThermalMap({
   const mapRef = useRef<any>(null);
   const markersLayerRef = useRef<any>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [cursorCoords, setCursorCoords] = useState<{ lat: number; lng: number } | null>(null);
 
   // Initialize Leaflet Map
   useEffect(() => {
@@ -212,6 +213,25 @@ export function ThermalMap({
         zoom,
         zoomControl: false,
         attributionControl: true,
+        wheelPxPerZoomLevel: 120, // Smooth, lower sensitivity wheel zoom
+        zoomDelta: 0.5,           // Finer zoom steps
+        zoomSnap: 0.5,            // Allow half-step zoom levels
+      });
+
+      // Track cursor Lat/Lng coordinates across the map
+      map.on("mousemove", (e: any) => {
+        if (isMounted && e.latlng) {
+          setCursorCoords({
+            lat: Number(e.latlng.lat.toFixed(4)),
+            lng: Number(e.latlng.lng.toFixed(4)),
+          });
+        }
+      });
+
+      map.on("mouseout", () => {
+        if (isMounted) {
+          setCursorCoords(null);
+        }
       });
 
       // 1. Tactical Dark Canvas (Esri World Dark Gray Base)
@@ -345,6 +365,40 @@ export function ThermalMap({
       className={`relative overflow-hidden w-full h-full ${className}`}
       style={{ height }}
     >
+      {/* ── NASA FIRMS Tactical Floating Text Readout (No Box, Single Line Always) ────────── */}
+      <div className="absolute top-3.5 left-1/2 -translate-x-1/2 z-[4000] pointer-events-none select-none max-w-full px-4">
+        <div className="flex items-center flex-nowrap whitespace-nowrap gap-3 text-xs text-white font-sans tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.95)]">
+          {/* Coordinates: Lat: no Lon: no (fixed width, tabular-nums so it never jitters or resizes) */}
+          <div className="flex items-center flex-nowrap shrink-0 gap-1 font-medium text-white">
+            <span className="text-white">Lat:</span>
+            <span className="font-semibold text-white tabular-nums inline-block w-[62px] text-left">
+              {cursorCoords ? `${cursorCoords.lat.toFixed(3)}°` : "—"}
+            </span>
+            <span className="text-white ml-1">Lon:</span>
+            <span className="font-semibold text-white tabular-nums inline-block w-[62px] text-left">
+              {cursorCoords ? `${cursorCoords.lng.toFixed(3)}°` : "—"}
+            </span>
+          </div>
+
+          <span className="text-white/60 font-light shrink-0">|</span>
+
+          {/* NASA FIRMS Feed & Instrument Information */}
+          <div className="flex items-center flex-nowrap shrink-0 gap-1.5 text-[11px] text-white">
+            <span className="font-semibold text-white">NASA FIRMS</span>
+            <span className="text-white/70">&bull;</span>
+            <span className="text-white">VIIRS Satellites (Suomi NPP, NOAA-20, NOAA-21)</span>
+          </div>
+
+          <span className="text-white/60 font-light shrink-0">|</span>
+
+          {/* Time Window Format */}
+          <div className="flex items-center flex-nowrap shrink-0 gap-1 text-[11px] text-white">
+            <span className="text-white">Window:</span>
+            <span className="font-semibold text-white">Last 24 Hours</span>
+          </div>
+        </div>
+      </div>
+
       {/* Map container */}
       <div ref={containerRef} className="w-full h-full" />
     </div>

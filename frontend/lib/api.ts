@@ -31,6 +31,38 @@ export interface ClassifiedEvent {
   brightness_temp?: number;
   detected_at?: string;
   classified_at?: string;
+  // Kinematics & Spread
+  centroid_drift_km?: number;
+  spread_velocity_kmph?: number;
+  spread_bearing_deg?: number;
+  spread_cardinal?: string;
+  spread_classification?: string;
+  footprint_growth_rate?: number;
+  // VIIRS Nightfire (VNF) Flare Catalog
+  is_known_vnf_flare?: boolean;
+  vnf_flare_id?: string;
+  vnf_facility_name?: string;
+  distance_to_vnf_flare_km?: number;
+  // ESA WorldCover 10m & Sentinel-2 MSI
+  esa_worldcover_code?: number;
+  esa_worldcover_label?: string;
+  esa_worldcover_color?: string;
+  has_sentinel_imagery?: boolean;
+  sentinel_mgrs_tile?: string;
+  swir_burn_index?: number;
+  // Statistical CUSUM Change-Point Evaluation
+  cusum_statistic?: number;
+  cusum_alert?: boolean;
+  cusum_regime?: string;
+  cusum_run_length?: number;
+  // Isolation Forest & Dual Engine
+  isolation_anomaly_score?: number;
+  is_isolation_outlier?: boolean;
+  dual_engine_status?: string;
+  // Context & Urgency
+  operational_urgency_score?: number;
+  urgency_tier?: string;
+  distance_to_nearest_facility_km?: number;
   shap_explanation?: {
     summary: string;
     primary_factors: string[];

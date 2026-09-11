@@ -14,7 +14,7 @@ import {
 const NAV_ITEMS = [
   { key: "dashboard",  label: "Dashboard",       href: "/dashboard",      icon: LayoutDashboard },
   { key: "alerts",     label: "Alerts",          href: "/alerts",         icon: Bell },
-  { key: "sites",      label: "Sites",           href: "/site/fac_001",   icon: Building2 },
+  { key: "sites",      label: "Sites",           href: "/site",           icon: Building2 },
   { key: "analytics",  label: "Analytics",       href: "/analytics",      icon: BarChart3 },
   { key: "historical", label: "Historical Data", href: "/dashboard/audit", icon: History },
 ];

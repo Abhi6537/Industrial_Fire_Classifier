@@ -294,6 +294,9 @@ export const FireMap: React.FC<FireMapProps> = ({
         center: [22.0, 79.0],
         zoom: 5,
         zoomControl: false,
+        wheelPxPerZoomLevel: 120, // Smooth, lower sensitivity wheel zoom
+        zoomDelta: 0.5,           // Finer zoom steps
+        zoomSnap: 0.5,            // Half-step zoom levels
       });
 
       const cartoKey = process.env.NEXT_PUBLIC_CARTO_KEY || "cb1_32gk_1_fb74a95ecbcdb533a5287d8d";
