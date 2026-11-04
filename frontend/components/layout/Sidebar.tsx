@@ -29,6 +29,7 @@ export function Sidebar() {
           const Icon = item.icon;
 
           const isActive = (() => {
+            if (!pathname) return false;
             if (item.key === "dashboard") return pathname === "/dashboard";
             if (item.key === "alerts") return pathname === "/alerts" || pathname === "/dashboard/alerts";
             if (item.key === "sites") return pathname.startsWith("/site");

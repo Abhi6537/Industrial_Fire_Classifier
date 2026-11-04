@@ -70,7 +70,12 @@ def run_pipeline(day_range: int = 1):
 
 
 if __name__ == "__main__":
-    df = run_pipeline(day_range=1)
+    import argparse
+    parser = argparse.ArgumentParser(description="End-to-End Ingestion Pipeline")
+    parser.add_argument("--days", type=int, default=3, help="Number of past days of satellite observations to ingest (default: 3)")
+    args = parser.parse_args()
+
+    df = run_pipeline(day_range=args.days)
     if not df.empty:
         print("\nPipeline Output Preview (Classified Hotspots):")
         cols_to_show = ["latitude", "longitude", "frp", "site_name", "label", "confidence", "severity"]
