@@ -65,8 +65,8 @@ class IsolationForestService:
             logger.info(f"Loaded {len(raw_df)} real FIRMS observations from [{TRAINING_DATA_PATH}].")
         else:
             logger.warning(f"Training data not found at [{TRAINING_DATA_PATH}]. Generating baseline training distribution...")
-            from ml.dataset_generator import generate_synthetic_firms_data
-            raw_df = generate_synthetic_firms_data(n_samples=2500)
+            from ml.dataset_generator import generate_benchmark_dataset
+            raw_df = generate_benchmark_dataset(samples_per_class=400)
 
         # Extract numerical features
         X = FeatureExtractor.extract_features(raw_df)

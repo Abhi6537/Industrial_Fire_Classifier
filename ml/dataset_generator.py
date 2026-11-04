@@ -204,6 +204,10 @@ def generate_benchmark_dataset(samples_per_class: int = 250, seed: int = 42) -> 
     return df
 
 
+# Compatibility alias
+generate_synthetic_firms_data = generate_benchmark_dataset
+
+
 if __name__ == "__main__":
     df = generate_benchmark_dataset(samples_per_class=200)
     print("Dataset generated successfully:")

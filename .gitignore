@@ -29,14 +29,15 @@ venv/
 .env.local
 .env.*.local
 
-# ML Models & Data Artifacts (large binaries)
-ml/models/*.pkl
-ml/models/*.joblib
-ml/models/*.bin
+# ML Models & Data Artifacts (production models are lightweight < 3MB total)
+!ml/models/*.pkl
+!ml/models/*.joblib
+!ml/models/*.bin
 !ml/models/.gitkeep
 
-# Data caches
-data/
+# Data caches (preserve sovereign boundary GeoJSON)
+data/*
+!data/india_territorial_boundary.json
 *.csv
 *.parquet
 *.jsonl
