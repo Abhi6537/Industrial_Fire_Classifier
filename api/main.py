@@ -166,6 +166,9 @@ def health_check():
         "version": settings.VERSION,
         "environment": settings.ENVIRONMENT,
         "target_region": settings.TARGET_REGION,
+        "supabase_connected": db.is_connected,
+        "has_service_role_key": bool(settings.SUPABASE_SERVICE_ROLE_KEY),
+        "live_events_count": len(db.get_events()),
     }
 
 
