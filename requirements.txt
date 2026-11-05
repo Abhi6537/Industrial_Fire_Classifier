@@ -15,8 +15,7 @@ geopandas>=0.14.0,<1.0.0
 shapely>=2.0.0,<3.0.0
 
 # Database Client
-supabase>=2.3.0,<3.0.0
-postgrest>=0.16.0,<1.0.0
+supabase>=2.10.0,<3.0.0
 
 # Machine Learning & Explainability
 scikit-learn>=1.4.0,<2.0.0
